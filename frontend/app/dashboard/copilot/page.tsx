@@ -78,12 +78,13 @@ export default function CopilotChatPage() {
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (err: any) {
+      const errorMsg = err.response?.data?.detail || err.message || "Unable to connect to BIS Copilot service.";
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           sender: "copilot",
-          text: "⚠️ System Notice: Unable to query vector repository. Please check connection.",
+          text: `⚠️ System Notice: ${errorMsg}`,
         },
       ]);
     } finally {
