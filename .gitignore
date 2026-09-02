@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/venv/
+venv/
+.venv/
+
+# Build & Next.js outputs
+.next/
+frontend/.next/
+dist/
+build/
+
+# Databases & Local environment
+*.db
+*.sqlite
+spectrais.db
+backend/spectrais.db
+.env
+.env.local
+frontend/.env.local
+
+# Python cache & bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.eggs/
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

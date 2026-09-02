@@ -1,0 +1,111 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AI Procurement Standards & Compliance Copilot API",
+    "description": "Production-grade RESTful API for BIS Standards Repository, User Management, Authentication, and Tender Compliance Analysis.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1 Endpoint"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register User and Organization",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "full_name", "organization_name"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 8 },
+                  "full_name": { "type": "string" },
+                  "organization_name": { "type": "string" },
+                  "designation": { "type": "string" },
+                  "role_name": { "type": "string", "default": "PROCUREMENT_OFFICER" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User successfully registered with JWT tokens." }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tokens generated." }
+        }
+      }
+    },
+    "/standards": {
+      "get": {
+        "tags": ["BIS Standards Repository"],
+        "summary": "List Standards",
+        "parameters": [
+          { "name": "query", "in": "query", "schema": { "type": "string" } },
+          { "name": "domain", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated list of BIS standards." }
+        }
+      },
+      "post": {
+        "tags": ["BIS Standards Repository"],
+        "summary": "Create Standard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["is_number", "title", "scope", "domain", "category"],
+                "properties": {
+                  "is_number": { "type": "string", "example": "IS 1363 : Part 1 : 2019" },
+                  "title": { "type": "string" },
+                  "scope": { "type": "string" },
+                  "domain": { "type": "string" },
+                  "category": { "type": "string" },
+                  "status": { "type": "string", "enum": ["ACTIVE", "REVISED", "WITHDRAWN", "DRAFT"], "default": "ACTIVE" },
+                  "certification_requirement": { "type": "string", "enum": ["MANDATORY", "VOLUNTARY", "REGULATED"], "default": "MANDATORY" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Standard created." }
+        }
+      }
+    }
+  }
+}
