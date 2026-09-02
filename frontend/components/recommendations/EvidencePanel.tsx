@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/Badge";
 interface RecommendationItem {
   recommendation_id: string;
   is_number: string;
-  standard_title: str;
-  clause_reference: str;
-  category_type: str;
-  applicability_reason: str;
-  evidence_text: str;
+  standard_title: string;
+  clause_reference: string;
+  category_type: string;
+  applicability_reason: string;
+  evidence_text: string;
   source_sections: string[];
   confidence_score: number;
   risk_level: string;

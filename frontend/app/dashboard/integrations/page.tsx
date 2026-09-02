@@ -55,7 +55,7 @@ export default function IntegrationsWorkspacePage() {
                   <Zap className="h-4 w-4 text-blue-400" />
                   {adapter.system_name}
                 </CardTitle>
-                <Badge variant={adapter.is_active ? "success" : "secondary"} className="text-[10px]">
+                <Badge variant={adapter.is_active ? "success" : "neutral"} className="text-[10px]">
                   {adapter.is_active ? "CONNECTED" : "INACTIVE"}
                 </Badge>
               </div>

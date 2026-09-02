@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/Badge";
 import { ArrowRightLeft, CheckCircle2, XCircle, AlertCircle, HelpCircle } from "lucide-react";
 
 interface ComparisonRow {
-  parameter: str;
-  tender_specification: str;
-  ideal_bis_standard: str;
+  parameter: string;
+  tender_specification: string;
+  ideal_bis_standard: string;
   compliance_status: string; // COMPLIANT, NON_COMPLIANT, PARTIAL, MISSING
   risk_indicator: string;
 }

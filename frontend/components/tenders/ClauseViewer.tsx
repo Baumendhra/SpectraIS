@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
 interface ClauseItem {
-  clause_id: str;
-  clause_title: str;
-  clause_category: str;
-  clause_text: str;
-  rationale: str;
+  clause_id: string;
+  clause_title: string;
+  clause_category: string;
+  clause_text: string;
+  rationale: string;
 }
 
 interface ClauseViewerProps {

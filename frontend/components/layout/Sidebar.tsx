@@ -21,15 +21,11 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Procurement OS", href: "/dashboard/procurement-os", icon: LayoutDashboard },
-  { name: "AI Command Center", href: "/dashboard/command-center", icon: Sparkles },
   { name: "Executive Analytics", href: "/dashboard/analytics", icon: Sparkles },
-  { name: "AI Recommendations", href: "/dashboard/recommendations", icon: Sparkles },
+  { name: "AI Recommendations & RAG", href: "/dashboard/recommendations", icon: Sparkles },
   { name: "AI Copilot Chat", href: "/dashboard/copilot", icon: Bot },
-  { name: "Supplier Intelligence", href: "/dashboard/suppliers", icon: Building2 },
   { name: "Gov Integrations", href: "/dashboard/integrations", icon: Building2 },
   { name: "AI Benchmark Eval", href: "/dashboard/evaluation", icon: BookOpenCheck },
-  { name: "Knowledge Base & RAG", href: "/dashboard/knowledge", icon: Database },
   { name: "BIS Standards", href: "/dashboard/standards", icon: BookOpenCheck },
   { name: "Tenders & Compliance", href: "/dashboard/tenders", icon: FileCheck2 },
   { name: "User Management", href: "/dashboard/users", icon: Users, roles: ["SUPER_ADMIN", "ORG_ADMIN"] },
