@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 from typing import List, Optional
-from sqlalchemy import String, Text, Date, ForeignKey, Table, Column, JSON, Enum as SQLEnum
+from sqlalchemy import String, Text, Date, ForeignKey, Table, Column, JSON, Boolean, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import BaseModel
@@ -17,6 +17,8 @@ class StandardStatus(str, enum.Enum):
 
 
 class CertificationRequirement(str, enum.Enum):
+    CRS = "CRS"
+    ISI = "ISI"
     MANDATORY = "MANDATORY"
     VOLUNTARY = "VOLUNTARY"
     REGULATED = "REGULATED"
@@ -59,13 +61,19 @@ class Standard(BaseModel):
     is_number: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False) # e.g. IS 1363 : Part 1 : 2019
     title: Mapped[str] = mapped_column(String(500), index=True, nullable=False)
     scope: Mapped[str] = mapped_column(Text, nullable=False)
-    domain: Mapped[str] = mapped_column(String(100), index=True, nullable=False) # e.g. Civil, Electronics, Heavy Machinery
-    category: Mapped[str] = mapped_column(String(100), index=True, nullable=False) # e.g. Fasteners, Safety Equipment, Cables
+    domain: Mapped[str] = mapped_column(String(100), index=True, nullable=False) # e.g. Electronics, IT, Telecom
+    category: Mapped[str] = mapped_column(String(100), index=True, nullable=False) # e.g. Computers, Mobile Phones, Telecom Equipment
+    sector: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True) # e.g. computers, electronics, laptops, phones, telecom
     status: Mapped[StandardStatus] = mapped_column(SQLEnum(StandardStatus), default=StandardStatus.ACTIVE, nullable=False)
     revision_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    latest_amendment_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     certification_requirement: Mapped[CertificationRequirement] = mapped_column(
-        SQLEnum(CertificationRequirement), default=CertificationRequirement.MANDATORY, nullable=False
+        SQLEnum(CertificationRequirement), default=CertificationRequirement.CRS, nullable=False
     )
+    is_crs_mandated: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_revised: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    superseded_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    last_scraped_at: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     keywords: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True)
     issuing_committee: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     ic_code: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)

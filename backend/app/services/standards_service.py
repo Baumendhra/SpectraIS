@@ -33,13 +33,19 @@ class StandardsService:
             )
         return StandardResponse.model_validate(std)
 
+    async def get_by_sector(self, sector: str) -> List[StandardResponse]:
+        items = await self.standards_repo.get_by_sector(sector)
+        return [StandardResponse.model_validate(item) for item in items]
+
     async def list_standards(self, params: StandardFilterParams) -> PaginatedResponse[StandardResponse]:
         items, total = await self.standards_repo.search_and_filter(
             query=params.query,
             domain=params.domain,
             category=params.category,
+            sector=params.sector,
             status=params.status,
             certification_requirement=params.certification_requirement,
+            is_crs_mandated=params.is_crs_mandated,
             page=params.page,
             size=params.size
         )

@@ -12,10 +12,18 @@ class StandardsRepository(BaseRepository[Standard]):
         super().__init__(Standard, session)
 
     async def get_by_is_number(self, is_number: str) -> Optional[Standard]:
+        # Support flexible IS number matching (e.g. "IS 13252", "13252", "IS 616")
+        clean_num = is_number.strip()
+        search_pattern = f"%{clean_num}%"
         stmt = select(Standard).options(
             selectinload(Standard.versions),
             selectinload(Standard.amendments)
-        ).where(Standard.is_number == is_number)
+        ).where(
+            or_(
+                Standard.is_number == clean_num,
+                Standard.is_number.ilike(search_pattern)
+            )
+        )
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
@@ -27,13 +35,30 @@ class StandardsRepository(BaseRepository[Standard]):
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
+    async def get_by_sector(self, sector: str) -> List[Standard]:
+        sector_pattern = f"%{sector.lower().strip()}%"
+        stmt = select(Standard).options(
+            selectinload(Standard.versions),
+            selectinload(Standard.amendments)
+        ).where(
+            or_(
+                Standard.sector.ilike(sector_pattern),
+                Standard.category.ilike(sector_pattern),
+                Standard.domain.ilike(sector_pattern)
+            )
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
     async def search_and_filter(
         self,
         query: Optional[str] = None,
         domain: Optional[str] = None,
         category: Optional[str] = None,
+        sector: Optional[str] = None,
         status: Optional[StandardStatus] = None,
         certification_requirement: Optional[CertificationRequirement] = None,
+        is_crs_mandated: Optional[bool] = None,
         page: int = 1,
         size: int = 10
     ) -> Tuple[List[Standard], int]:
@@ -49,7 +74,9 @@ class StandardsRepository(BaseRepository[Standard]):
                 or_(
                     Standard.is_number.ilike(search_pattern),
                     Standard.title.ilike(search_pattern),
-                    Standard.scope.ilike(search_pattern)
+                    Standard.scope.ilike(search_pattern),
+                    Standard.category.ilike(search_pattern),
+                    Standard.domain.ilike(search_pattern)
                 )
             )
 
@@ -59,11 +86,23 @@ class StandardsRepository(BaseRepository[Standard]):
         if category:
             filters.append(Standard.category == category)
 
+        if sector:
+            sector_pattern = f"%{sector.lower().strip()}%"
+            filters.append(
+                or_(
+                    Standard.sector.ilike(sector_pattern),
+                    Standard.category.ilike(sector_pattern)
+                )
+            )
+
         if status:
             filters.append(Standard.status == status)
 
         if certification_requirement:
             filters.append(Standard.certification_requirement == certification_requirement)
+
+        if is_crs_mandated is not None:
+            filters.append(Standard.is_crs_mandated == is_crs_mandated)
 
         if filters:
             stmt = stmt.where(*filters)

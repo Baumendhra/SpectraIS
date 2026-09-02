@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Callable
+from typing import List, Callable, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,6 +60,21 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Could not validate credentials: {str(e)}"
         )
+
+
+security_optional = HTTPBearer(auto_error=False)
+
+
+async def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_optional),
+    session: AsyncSession = Depends(get_db)
+) -> Optional[User]:
+    if not credentials:
+        return None
+    try:
+        return await get_current_user(credentials=credentials, session=session)
+    except Exception:
+        return None
 
 
 def require_roles(allowed_roles: List[str]):
