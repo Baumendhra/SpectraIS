@@ -34,9 +34,15 @@ class StandardResponse(BaseModel):
     scope: str
     domain: str
     category: str
+    sector: Optional[str] = None
     status: StandardStatus
     revision_date: Optional[date] = None
+    latest_amendment_date: Optional[date] = None
     certification_requirement: CertificationRequirement
+    is_crs_mandated: bool = True
+    is_revised: bool = False
+    superseded_by: Optional[str] = None
+    last_scraped_at: Optional[date] = None
     keywords: Optional[List[str]] = []
     issuing_committee: Optional[str] = None
     ic_code: Optional[str] = None
@@ -51,14 +57,19 @@ class StandardResponse(BaseModel):
 
 
 class StandardCreate(BaseModel):
-    is_number: str = Field(..., example="IS 1363 : Part 1 : 2019")
-    title: str = Field(..., example="Hexagon Head Bolts, Screws and Nuts")
-    scope: str = Field(..., example="Technical supply conditions for bolts and screws...")
-    domain: str = Field(..., example="Mechanical Engineering")
-    category: str = Field(..., example="Fasteners & Hardware")
+    is_number: str = Field(..., example="IS 13252(Part 1):2010")
+    title: str = Field(..., example="Information Technology Equipment - Safety")
+    scope: str = Field(..., example="Safety requirements for IT equipment...")
+    domain: str = Field(..., example="Electronics & Information Technology")
+    category: str = Field(..., example="Computers & IT Hardware")
+    sector: Optional[str] = Field(None, example="computers")
     status: StandardStatus = StandardStatus.ACTIVE
     revision_date: Optional[date] = None
-    certification_requirement: CertificationRequirement = CertificationRequirement.MANDATORY
+    latest_amendment_date: Optional[date] = None
+    certification_requirement: CertificationRequirement = CertificationRequirement.CRS
+    is_crs_mandated: bool = True
+    is_revised: bool = False
+    superseded_by: Optional[str] = None
     keywords: Optional[List[str]] = []
     issuing_committee: Optional[str] = None
     ic_code: Optional[str] = None
@@ -70,9 +81,14 @@ class StandardUpdate(BaseModel):
     scope: Optional[str] = None
     domain: Optional[str] = None
     category: Optional[str] = None
+    sector: Optional[str] = None
     status: Optional[StandardStatus] = None
     revision_date: Optional[date] = None
+    latest_amendment_date: Optional[date] = None
     certification_requirement: Optional[CertificationRequirement] = None
+    is_crs_mandated: Optional[bool] = None
+    is_revised: Optional[bool] = None
+    superseded_by: Optional[str] = None
     keywords: Optional[List[str]] = None
     issuing_committee: Optional[str] = None
     ic_code: Optional[str] = None
@@ -83,7 +99,9 @@ class StandardFilterParams(BaseModel):
     query: Optional[str] = None
     domain: Optional[str] = None
     category: Optional[str] = None
+    sector: Optional[str] = None
     status: Optional[StandardStatus] = None
     certification_requirement: Optional[CertificationRequirement] = None
+    is_crs_mandated: Optional[bool] = None
     page: int = Field(default=1, ge=1)
     size: int = Field(default=10, ge=1, le=100)

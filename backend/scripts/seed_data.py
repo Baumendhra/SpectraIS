@@ -61,59 +61,87 @@ async def seed_data():
         session.add(admin_user)
         print("✅ Seeded Admin User (admin@mohua.gov.in / Admin123!).")
 
-        # 4. Seed Sample BIS Standards
+        # 4. Seed Sample & CRS Mandatory BIS Standards
         sample_standards = [
             {
-                "is_number": "IS 1363 : Part 1 : 2019",
-                "title": "Hexagon Head Bolts, Screws and Nuts - Product Grade C - Part 1 Hexagon Head Bolts (Size Range M5 to M64)",
-                "scope": "Specifies technical supply conditions, dimensions, tolerances, and mechanical property requirements for Grade C hexagon head bolts used in general structural engineering.",
-                "domain": "Mechanical Engineering & Fasteners",
-                "category": "Fasteners & Industrial Hardware",
+                "is_number": "IS 13252(Part 1):2010",
+                "title": "Information Technology Equipment - Safety - Part 1: General Requirements",
+                "scope": "Mandatory safety specification for Automatic Data Processing Machines, Laptops, Notebooks, Tablets, Mobile Phones, Printers, Scanners, POS Terminals, Power Adaptors, and Hard Disk Drives under BIS CRS.",
+                "domain": "Electronics & Information Technology",
+                "category": "Computers, Laptops, Mobile Phones & IT Peripherals",
+                "sector": "computers",
                 "status": StandardStatus.ACTIVE,
-                "revision_date": date(2019, 4, 15),
-                "certification_requirement": CertificationRequirement.MANDATORY,
-                "keywords": ["bolts", "fasteners", "hexagon head", "steel", "grade c", "structural"],
-                "issuing_committee": "PGD 31 Fasteners Committee",
-                "ic_code": "PGD31"
+                "revision_date": date(2010, 4, 1),
+                "certification_requirement": CertificationRequirement.CRS,
+                "is_crs_mandated": True,
+                "is_revised": False,
+                "keywords": ["laptops", "notebooks", "tablets", "computers", "it equipment", "mobile phones", "safety"],
+                "issuing_committee": "LITD 14 Information Technology Equipment Safety",
+                "ic_code": "LITD14"
             },
             {
-                "is_number": "IS 2062 : 2011",
-                "title": "Hot Rolled Medium and High Tensile Structural Steel - Specification",
-                "scope": "Covers requirements for steel micro-alloyed with carbon, manganese, and structural elements intended for use in welded, bolted, and riveted structures.",
-                "domain": "Civil & Metallurgical Engineering",
-                "category": "Structural Steel & Metals",
+                "is_number": "IS 616:2017",
+                "title": "Audio, Video and Similar Electronic Apparatus - Safety Requirements",
+                "scope": "Mandatory safety requirements for Amplifiers, Televisions, Bluetooth Speakers, Smart Speakers, Wireless Headphones, Video Games, and Power Adaptors under BIS CRS.",
+                "domain": "Electronics & Information Technology",
+                "category": "Audio, Video & Consumer Electronics",
+                "sector": "electronics",
                 "status": StandardStatus.ACTIVE,
-                "revision_date": date(2011, 8, 20),
-                "certification_requirement": CertificationRequirement.MANDATORY,
-                "keywords": ["structural steel", "hot rolled", "tensile strength", "beam", "plate", "construction"],
-                "issuing_committee": "MTD 4 Wrought Steel Products",
-                "ic_code": "MTD04"
+                "revision_date": date(2017, 9, 15),
+                "certification_requirement": CertificationRequirement.CRS,
+                "is_crs_mandated": True,
+                "is_revised": False,
+                "keywords": ["television", "audio", "video", "speakers", "headphones", "electronics", "safety"],
+                "issuing_committee": "LITD 07 Audio, Video and Similar Electronic Apparatus",
+                "ic_code": "LITD07"
             },
             {
-                "is_number": "IS 694 : 2010",
-                "title": "Polyvinyl Chloride Insulated Unsheathed and Sheathed Cables for Working Voltages up to and including 1100 V",
-                "scope": "Prescribes requirements for single core and multicore PVC insulated cables for electric power distribution, wiring, and industrial apparatus.",
-                "domain": "Electrical & Electronics",
-                "category": "Electrical Cables & Wiring",
+                "is_number": "IS 16333 (Part 3) : 2022",
+                "title": "Mobile Phone Handsets - Part 3: Indian Language Support for Mobile Phone Handsets - Specific Requirements",
+                "scope": "Prescribes requirements for display of Indian languages, text entry, and readability compliance in mobile phones sold in India.",
+                "domain": "Electronics & Information Technology",
+                "category": "Mobile Phones & Telecom Equipment",
+                "sector": "phones",
                 "status": StandardStatus.ACTIVE,
-                "revision_date": date(2010, 11, 10),
-                "certification_requirement": CertificationRequirement.REGULATED,
-                "keywords": ["pvc cable", "copper conductor", "insulated wiring", "electrical safety", "1100v"],
-                "issuing_committee": "ETD 9 Power Cables",
-                "ic_code": "ETD09"
+                "revision_date": date(2022, 5, 1),
+                "certification_requirement": CertificationRequirement.CRS,
+                "is_crs_mandated": True,
+                "is_revised": False,
+                "keywords": ["mobile phones", "smartphones", "indian language support", "unicode", "telecom"],
+                "issuing_committee": "LITD 16 Mobile Electronics & Language Support",
+                "ic_code": "LITD16"
             },
             {
-                "is_number": "IS 15652 : 2006",
-                "title": "Insulating Mats for Electrical Purposes - Specification",
-                "scope": "Covers high-voltage elastomeric insulating mats for electrical operations up to 33 kV substation applications protecting personnel against accidental shock.",
-                "domain": "Safety & Electrical Infrastructure",
-                "category": "Safety Equipment & Insulators",
+                "is_number": "IS 16046(Part 2): 2018",
+                "title": "Sealed Secondary Cells/Batteries Containing Alkaline or Other Non-Acid Electrolytes - Part 2 Lithium Systems",
+                "scope": "Mandatory safety parameters for rechargeable Lithium-Ion and Lithium Polymer batteries used in mobile phones, laptops, and portable electronic devices.",
+                "domain": "Electrotechnical & Power Sources",
+                "category": "Batteries & Power Sources",
+                "sector": "batteries_chargers",
                 "status": StandardStatus.ACTIVE,
-                "revision_date": date(2006, 6, 30),
-                "certification_requirement": CertificationRequirement.MANDATORY,
-                "keywords": ["insulating mat", "high voltage", "substation safety", "shock protection", "elastomeric"],
-                "issuing_committee": "ETD 18 Industrial Electro-heating",
-                "ic_code": "ETD18"
+                "revision_date": date(2018, 6, 1),
+                "certification_requirement": CertificationRequirement.CRS,
+                "is_crs_mandated": True,
+                "is_revised": False,
+                "keywords": ["battery", "lithium ion", "power bank", "portable power", "secondary cells"],
+                "issuing_committee": "ETD 11 Secondary Cells and Batteries Committee",
+                "ic_code": "ETD11"
+            },
+            {
+                "is_number": "IS 18112:2025",
+                "title": "Specification for Television Sets - Digital Satellite and Cable Tuner Compatibility",
+                "scope": "Mandatory specification for digital satellite, cable TV reception, and built-in tuner requirements in Smart TV sets.",
+                "domain": "Electronics & Telecom Equipment",
+                "category": "Television & Telecom Apparatus",
+                "sector": "telecom",
+                "status": StandardStatus.ACTIVE,
+                "revision_date": date(2025, 1, 1),
+                "certification_requirement": CertificationRequirement.CRS,
+                "is_crs_mandated": True,
+                "is_revised": False,
+                "keywords": ["television", "smart tv", "tuner", "telecom", "set top box"],
+                "issuing_committee": "LITD 06 Audio, Video and Multimedia Systems",
+                "ic_code": "LITD06"
             }
         ]
 
@@ -125,9 +153,9 @@ async def seed_data():
             # Version
             ver = StandardVersion(
                 standard_id=std.id,
-                version_number="v4.0",
+                version_number="v1.0",
                 publication_date=std.revision_date or date(2020, 1, 1),
-                summary_of_changes="Aligned with international ISO specifications and updated quality parameters."
+                summary_of_changes="Latest mandatory revision under BIS Compulsory Registration Scheme."
             )
             session.add(ver)
 
@@ -135,14 +163,14 @@ async def seed_data():
             am = Amendment(
                 standard_id=std.id,
                 amendment_number=1,
-                release_date=date(2022, 3, 15),
+                release_date=date(2023, 1, 1),
                 title="Amendment No. 1 to IS Standard",
-                description="Updated tolerance limits in clause 4.2."
+                description="Updated safety limits and language support guidelines."
             )
             session.add(am)
 
         await session.commit()
-        print("✅ Seeded Sample BIS Standards, Versions, and Amendments.")
+        print("✅ Seeded Sample & CRS Mandatory BIS Standards, Versions, and Amendments.")
         print("🎉 Database Seeding Completed Successfully!")
 
 
