@@ -58,6 +58,8 @@ export default function RecommendationsWorkspacePage() {
   // Requirement PDF Upload state
   const [specPdfFile, setSpecPdfFile] = useState<File | null>(null);
   const [isAnalyzingPdf, setIsAnalyzingPdf] = useState(false);
+  const specFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isDraggingSpec, setIsDraggingSpec] = useState(false);
 
   // Knowledge Base / RAG Ingestion state
   const [kbJobs, setKbJobs] = useState<IngestionJob[]>([]);
@@ -67,6 +69,8 @@ export default function RecommendationsWorkspacePage() {
   const [kbCategory, setKbCategory] = useState("Fasteners & Industrial Hardware");
   const [isKbUploading, setIsKbUploading] = useState(false);
   const [kbUploadSuccess, setKbUploadSuccess] = useState<string | null>(null);
+  const kbFileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isDraggingKb, setIsDraggingKb] = useState(false);
 
   // Load Ingestion jobs when switching to knowledge tab or on load
   const fetchKbJobs = async () => {
@@ -312,26 +316,74 @@ export default function RecommendationsWorkspacePage() {
               ) : (
                 /* PDF Upload Form */
                 <form onSubmit={handleUploadSpecPdf} className="space-y-4">
-                  <div className="border-2 border-dashed border-slate-800 hover:border-blue-500/50 rounded-xl p-6 text-center space-y-2 bg-slate-900/40 transition-colors">
-                    <Upload className="h-8 w-8 text-blue-400 mx-auto" />
-                    <div className="text-xs text-slate-300 font-semibold">
-                      {specPdfFile ? specPdfFile.name : "Select or Drop Tender / Spec PDF Document"}
-                    </div>
-                    <p className="text-[11px] text-slate-500">
-                      Supports official tender PDFs, BOQ technical schedules, and equipment specifications.
-                    </p>
+                  <div
+                    onClick={() => specFileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDraggingSpec(true);
+                    }}
+                    onDragLeave={() => setIsDraggingSpec(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingSpec(false);
+                      if (e.dataTransfer.files?.[0]) setSpecPdfFile(e.dataTransfer.files[0]);
+                    }}
+                    className={`cursor-pointer border-2 border-dashed rounded-xl p-6 text-center space-y-2 transition-all ${
+                      isDraggingSpec
+                        ? "border-blue-500 bg-blue-500/10 scale-[1.01]"
+                        : "border-slate-800 hover:border-blue-500/50 bg-slate-900/40"
+                    }`}
+                  >
                     <input
+                      ref={specFileInputRef}
                       type="file"
-                      accept=".pdf"
+                      accept=".pdf,.docx,.txt"
                       onChange={(e) => setSpecPdfFile(e.target.files?.[0] || null)}
                       className="hidden"
-                      id="spec-pdf-upload"
                     />
-                    <label htmlFor="spec-pdf-upload" className="inline-block cursor-pointer pt-1">
-                      <Button type="button" variant="outline" size="sm">
-                        Browse PDF File
-                      </Button>
-                    </label>
+
+                    {specPdfFile ? (
+                      <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-950/40 border border-blue-800/40 text-left">
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-7 w-7 text-blue-400 shrink-0" />
+                          <div>
+                            <p className="text-xs font-semibold text-white truncate max-w-[280px] sm:max-w-md">
+                              {specPdfFile.name}
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              {(specPdfFile.size / 1024).toFixed(1)} KB • Click or drop another to replace
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSpecPdfFile(null);
+                            if (specFileInputRef.current) specFileInputRef.current.value = "";
+                          }}
+                          className="text-slate-400 hover:text-rose-400 p-1.5 transition-colors"
+                          title="Remove file"
+                        >
+                          <XCircle className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-blue-400 mx-auto" />
+                        <div className="text-xs text-slate-200 font-semibold">
+                          Click to Browse or Drag & Drop Tender / Spec Document
+                        </div>
+                        <p className="text-[11px] text-slate-500">
+                          Supports official tender PDFs, BOQ technical schedules, and equipment specifications.
+                        </p>
+                        <div className="pt-2">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 pointer-events-none">
+                            <Upload className="h-3.5 w-3.5 text-blue-400" /> Browse File
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
@@ -440,6 +492,39 @@ export default function RecommendationsWorkspacePage() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Government Classification & Statutory Metadata Bar */}
+              {(profile.sectional_committee || profile.suggested_hsn || profile.qco_enforced) && (
+                <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+                  <div className="flex flex-wrap items-center gap-4 text-slate-300">
+                    {profile.sectional_committee && (
+                      <div>
+                        <span className="text-slate-500 block text-[10px] uppercase font-semibold">BIS Sectional Committee</span>
+                        <span className="font-semibold text-blue-300">{profile.sectional_committee}</span>
+                      </div>
+                    )}
+                    {profile.suggested_hsn && (
+                      <div className="border-l border-slate-800 pl-4">
+                        <span className="text-slate-500 block text-[10px] uppercase font-semibold">Suggested HSN / SAC</span>
+                        <span className="font-mono text-emerald-400 font-bold">{profile.suggested_hsn}</span>
+                      </div>
+                    )}
+                  </div>
+                  {profile.qco_enforced && (
+                    <Badge variant="danger" className="font-bold py-1 px-3 text-[11px] tracking-wide">
+                      GOVERNMENT QCO MANDATED
+                    </Badge>
+                  )}
+                </div>
+              )}
+
+              {/* Statutory Legal Disclaimer */}
+              {profile.statutory_disclaimer && (
+                <div className="p-3 rounded-xl bg-blue-950/20 border border-blue-800/30 text-[11px] text-slate-300 leading-relaxed">
+                  <span className="font-bold text-blue-400 block mb-0.5">Government Procurement Rule 144(xi) GFR 2017 Notice:</span>
+                  {profile.statutory_disclaimer}
+                </div>
+              )}
 
               {/* Recommendations Cards */}
               <div className="space-y-4">
@@ -596,23 +681,74 @@ export default function RecommendationsWorkspacePage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleKbUpload} className="space-y-4">
-                <div className="border-2 border-dashed border-slate-800 hover:border-blue-500/50 rounded-xl p-6 text-center space-y-2 bg-slate-900/40 transition-colors">
-                  <Upload className="h-8 w-8 text-blue-400 mx-auto" />
-                  <div className="text-xs text-slate-300 font-semibold">
-                    {kbFile ? kbFile.name : "Select or Drop BIS Standard PDF file here"}
-                  </div>
+                <div
+                  onClick={() => kbFileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDraggingKb(true);
+                  }}
+                  onDragLeave={() => setIsDraggingKb(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDraggingKb(false);
+                    if (e.dataTransfer.files?.[0]) setKbFile(e.dataTransfer.files[0]);
+                  }}
+                  className={`cursor-pointer border-2 border-dashed rounded-xl p-6 text-center space-y-2 transition-all ${
+                    isDraggingKb
+                      ? "border-blue-500 bg-blue-500/10 scale-[1.01]"
+                      : "border-slate-800 hover:border-blue-500/50 bg-slate-900/40"
+                  }`}
+                >
                   <input
+                    ref={kbFileInputRef}
                     type="file"
                     accept=".pdf"
                     onChange={(e) => setKbFile(e.target.files?.[0] || null)}
                     className="hidden"
-                    id="kb-pdf-upload"
                   />
-                  <label htmlFor="kb-pdf-upload" className="inline-block cursor-pointer">
-                    <Button type="button" variant="outline" size="sm">
-                      Browse BIS Standard PDF
-                    </Button>
-                  </label>
+
+                  {kbFile ? (
+                    <div className="flex items-center justify-between p-3.5 rounded-lg bg-blue-950/40 border border-blue-800/40 text-left">
+                      <div className="flex items-center gap-3">
+                        <Database className="h-7 w-7 text-blue-400 shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-white truncate max-w-[280px] sm:max-w-md">
+                            {kbFile.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            {(kbFile.size / 1024).toFixed(1)} KB • Click or drop another to replace
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setKbFile(null);
+                          if (kbFileInputRef.current) kbFileInputRef.current.value = "";
+                        }}
+                        className="text-slate-400 hover:text-rose-400 p-1.5 transition-colors"
+                        title="Remove file"
+                      >
+                        <XCircle className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="h-8 w-8 text-blue-400 mx-auto" />
+                      <div className="text-xs text-slate-200 font-semibold">
+                        Click to Browse or Drag & Drop BIS Standard PDF file
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Upload official BIS standard PDFs for automated clause extraction, semantic chunking, and Qdrant indexing.
+                      </p>
+                      <div className="pt-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 pointer-events-none">
+                          <Upload className="h-3.5 w-3.5 text-blue-400" /> Browse PDF File
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
