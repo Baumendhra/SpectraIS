@@ -1,4 +1,5 @@
 import logging
+import uuid
 from typing import Dict, Any, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,10 +58,11 @@ class RAGCopilotService:
 
         # 4. Record Audit Log
         if user_id:
+            u_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
             await self.audit_repo.log_action(
                 action="COPILOT_QUERY",
                 resource="rag_copilot",
-                user_id=user_id,
+                user_id=u_uuid,
                 details={
                     "query": user_query,
                     "retrieved_count": len(retrieved_chunks),
