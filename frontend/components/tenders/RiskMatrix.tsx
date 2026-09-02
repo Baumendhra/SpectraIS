@@ -6,7 +6,7 @@ interface RiskItem {
   risk_id: string;
   category: string;
   title: string;
-  description: str;
+  description: string;
   severity: string; // Critical, High, Medium, Low
   mitigation_strategy: string;
 }
