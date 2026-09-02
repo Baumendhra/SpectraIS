@@ -100,7 +100,6 @@ class ComplianceProfileBuilder:
             confidence_level=confidence.overall_confidence,
             qco_count=qco_count
         )
-
         profile_id = f"PROF-{uuid.uuid4().hex[:8].upper()}"
 
         disclaimer = (
@@ -124,5 +123,8 @@ class ComplianceProfileBuilder:
             sectional_committee=classification.sectional_committee,
             suggested_hsn=classification.suggested_hsn,
             qco_enforced=spec.qco_mandated or qco_count > 0,
-            statutory_disclaimer=disclaimer
+            statutory_disclaimer=disclaimer,
+            needs_clarification=spec.needs_clarification,
+            missing_parameters=spec.missing_parameters,
+            clarification_questions=spec.clarification_questions
         )

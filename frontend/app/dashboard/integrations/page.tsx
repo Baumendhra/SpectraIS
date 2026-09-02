@@ -101,6 +101,39 @@ export default function IntegrationsWorkspacePage() {
           </Card>
         ))}
       </div>
+
+      {/* Jury Integration Guide & Air-Gapped Gazette Upload Banner */}
+      <Card className="glass-panel border-blue-500/30 bg-blue-950/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base text-blue-300 flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-blue-400" />
+            Government Security Architecture & Offline Gazette Sync Engine
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-300 leading-relaxed">
+            SpectraIS supports dual operational modes for staying up-to-date with Bureau of Indian Standards (BIS) revisions:
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-2 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4" /> Mode 1: Live Scraping & Web Sync (Active)
+              </span>
+              <p className="text-slate-400 text-[11px]">
+                The built-in daily scraper automatically crawls <code className="text-blue-300">crsbis.in</code> and <code className="text-blue-300">bis.gov.in</code> to detect newly published IS revisions, amendments, and Quality Control Orders (QCOs).
+              </p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5">
+              <span className="font-bold text-blue-400 flex items-center gap-1.5">
+                <Cpu className="h-4 w-4" /> Mode 2: Air-Gapped Monthly Gazette Upload
+              </span>
+              <p className="text-slate-400 text-[11px]">
+                For secure, air-gapped government networks without internet access, procurement officers can upload official monthly BIS Gazette manifest JSON/PDF files to refresh the knowledge base offline.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

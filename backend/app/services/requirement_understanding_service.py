@@ -234,6 +234,56 @@ class RequirementUnderstandingEngine:
         if mii_percent:
             cert_reqs.append(f"Make in India (MII) Local Content Certificate (Minimum {mii_percent}%)")
 
+        # 10. Adaptive Clarification Engine for Underspecified Queries
+        missing_params = []
+        clarification_qs = []
+
+        if "led" in lower or "luminaire" in lower or "light" in lower:
+            if "surge_protection_kv" not in operational_params:
+                missing_params.append("Surge Protection Level (kV)")
+                clarification_qs.append({
+                    "key": "surge",
+                    "question": "What is the required Surge Protection Level?",
+                    "options": ["5kV Surge Protection", "10kV Surge Protection (Recommended)", "15kV Heavy Duty Surge Protection"]
+                })
+            if "ingress_protection" not in operational_params:
+                missing_params.append("Ingress Weatherproofing Rating (IP)")
+                clarification_qs.append({
+                    "key": "ip_rating",
+                    "question": "What Ingress Protection rating is required?",
+                    "options": ["IP65 Weatherproof", "IP66 Heavy Weatherproof (Recommended)", "IP67 Submersible"]
+                })
+            if "rated_power" not in operational_params:
+                missing_params.append("System Power Rating (Wattage)")
+                clarification_qs.append({
+                    "key": "power",
+                    "question": "Select target LED Luminaire Wattage:",
+                    "options": ["60W System", "90W System", "120W System", "150W High Power"]
+                })
+
+        elif "laptop" in lower or "notebook" in lower or "computer" in lower:
+            missing_params.append("Processor & Memory Tier")
+            clarification_qs.append({
+                "key": "ram",
+                "question": "Select System Memory & Storage Configuration:",
+                "options": ["16GB RAM + 512GB NVMe SSD (Recommended)", "8GB RAM + 256GB SSD", "32GB RAM + 1TB NVMe SSD"]
+            })
+            clarification_qs.append({
+                "key": "language",
+                "question": "Mandatory Indian Language Support (IS 16333 Part 3)?",
+                "options": ["Yes - BIS CRS Mandated IS 16333", "Standard English Keyboard"]
+            })
+
+        elif "cctv" in lower or "camera" in lower or "surveillance" in lower:
+            missing_params.append("Resolution & Storage Encryption")
+            clarification_qs.append({
+                "key": "cctv_res",
+                "question": "Select Camera Resolution & Sensor Type:",
+                "options": ["4MP Full HD IP Camera (Recommended)", "2MP Standard IP Camera", "4K 8MP Ultra HD Camera"]
+            })
+
+        needs_clarification = len(missing_params) > 0
+
         return StructuredRequirementSpec(
             product_category=product_category,
             domain=domain,
@@ -241,10 +291,13 @@ class RequirementUnderstandingEngine:
             environment=env,
             technical_requirements=tech_reqs,
             certification_requirements=cert_reqs,
-            confidence=0.92 if cleaned_citations or operational_params else 0.85,
+            confidence=0.95 if not needs_clarification else 0.78,
             detected_is_citations=cleaned_citations,
             operational_parameters=operational_params,
             make_in_india_percent=mii_percent,
             qco_mandated=qco_mandated or ("led" in lower or "laptop" in lower or "cctv" in lower or "battery" in lower),
-            nabl_test_required=nabl_required or True
+            nabl_test_required=nabl_required or True,
+            needs_clarification=needs_clarification,
+            missing_parameters=missing_params,
+            clarification_questions=clarification_qs
         )
