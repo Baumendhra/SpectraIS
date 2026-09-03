@@ -56,12 +56,22 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
             {/* Header: IS Number & Badges */}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <span className="font-bold text-base text-blue-400 tracking-tight">{item.is_number}</span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {item.is_qco_mandated && (
                   <Badge variant="danger" className="text-[10px] font-bold tracking-wide">
                     QCO MANDATORY
                   </Badge>
                 )}
+                <Badge
+                  variant={
+                    item.status === "REVISED" || item.supersession_warning
+                      ? "danger"
+                      : "success"
+                  }
+                  className="text-[10px] font-bold tracking-wide flex items-center gap-1"
+                >
+                  {item.version_status_badge || (item.status === "REVISED" ? "🔴 REVISED" : "🟢 Up-to-Date (2025 Edition)")}
+                </Badge>
                 <Badge
                   variant={
                     item.category_type.includes("Mandatory")

@@ -414,6 +414,49 @@ export default function RecommendationsWorkspacePage() {
             </CardContent>
           </Card>
 
+          {/* Interactive Adaptive Clarification Engine Card */}
+          {profile?.needs_clarification && (
+            <Card className="glass-panel border-amber-500/40 bg-amber-950/20">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2 text-amber-300">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                    Adaptive Clarification Engine: Additional Parameters Recommended
+                  </CardTitle>
+                  <Badge variant="warning" className="text-[10px] font-bold">
+                    {profile.missing_parameters?.length || 0} Underspecified Parameter(s)
+                  </Badge>
+                </div>
+                <CardDescription className="text-xs text-amber-200/80">
+                  To ensure 100% precise, legally binding Indian Standards recommendations, click an option to refine your specification:
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-2">
+                {profile.clarification_questions?.map((q: any, idx: number) => (
+                  <div key={idx} className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+                    <label className="text-xs font-semibold text-white block">{q.question}</label>
+                    <div className="flex flex-wrap gap-2">
+                      {q.options?.map((opt: string, optIdx: number) => (
+                        <button
+                          key={optIdx}
+                          type="button"
+                          onClick={() => {
+                            const newText = `${procurementInput.trim()} ${opt}.`;
+                            setProcurementInput(newText);
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-blue-600 hover:text-white border border-slate-700 text-slate-200 transition-all shadow-sm flex items-center gap-1.5"
+                        >
+                          <Sparkles className="h-3 w-3 text-amber-400" />
+                          + {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           {/* If Tender PDF was analyzed, display Document Summary & Compliance Score Breakdown */}
           {tenderAnalysis && (
             <Card className="glass-panel border-blue-500/30 bg-blue-950/10">

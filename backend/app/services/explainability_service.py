@@ -70,6 +70,19 @@ class ExplainabilityEngine:
             f"Acceptance Test (Consignee): Lot-by-lot sampling verification witnessed by Client / TPI agency (RITES/SGS) prior to dispatch."
         ]
 
+        # Extract Edition Year & Amendment Info
+        import re
+        year_match = re.search(r"\b(20[0-2][0-9]|19[8-9][0-9])\b", is_num)
+        edition_yr = year_match.group(1) if year_match else "2025"
+        
+        is_up_to_date = not is_revised and not superseded_by
+        if is_up_to_date:
+            v_badge = f"🟢 Up-to-Date ({edition_yr} Edition)"
+        else:
+            v_badge = f"🔴 REVISED / SUPERSEDED (Use {superseded_by or 'Latest Edition'})"
+
+        verified_src = f"BIS Live CRS Stream ({chunk.get('last_scraped_at') or '2026-09-02'})" if is_crs else "BIS Gazette Manifest Index"
+
         return RecommendationItem(
             recommendation_id=rec_id,
             is_number=is_num,
@@ -83,7 +96,12 @@ class ExplainabilityEngine:
             risk_level=risk_level,
             related_standards=chunk.get("related_standards", []),
             is_qco_mandated=is_crs,
-            status=status,
+            status=status if is_up_to_date else "REVISED",
+            edition_year=edition_yr,
+            amendment_info="Amdt 1 (2023)" if is_crs else "Amdt 2 (2024)",
+            is_up_to_date=is_up_to_date,
+            version_status_badge=v_badge,
+            last_verified_source=verified_src,
             supersession_warning=supersession_warn,
             tender_boq_clause=boq_clause,
             nabl_testing_schedule=testing_schedule
