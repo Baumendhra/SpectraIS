@@ -22,6 +22,20 @@ class RetrievalService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    @staticmethod
+    def build_context_snippet(chunks: List[Dict[str, Any]]) -> str:
+        """Formats retrieved chunks into grounded text context for LLM prompt."""
+        if not chunks:
+            return "No relevant Bureau of Indian Standards (BIS) documents found in database registry."
+        snippets = []
+        for i, chunk in enumerate(chunks, start=1):
+            is_num = chunk.get("is_number", "IS Unknown")
+            title = chunk.get("title", "")
+            clause = chunk.get("clause_ref", "")
+            content = chunk.get("content") or chunk.get("chunk_text") or ""
+            snippets.append(f"[{i}] Standard: {is_num} - {title}\nClause: {clause}\nExcerpt: {content}")
+        return "\n\n".join(snippets)
+
     async def hybrid_retrieve(
         self,
         query: str,
