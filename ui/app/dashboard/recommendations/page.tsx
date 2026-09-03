@@ -17,9 +17,9 @@ import {
   FileCheck2,
   AlertTriangle,
   ArrowRight,
-  Plus,
-  SearchCheck,
-  Check
+  TrendingUp,
+  Cpu,
+  SearchCheck
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -47,7 +47,7 @@ export default function RecommendationsWorkspacePage() {
   // Recommendation Input state
   const [inputMode, setInputMode] = useState<"text" | "pdf">("text");
   const [procurementInput, setProcurementInput] = useState(
-    "Need procurement of LED street lights for municipal highway lighting with minimum 10kV surge protection and IP66 ingress rating."
+    "Procurement of 500 High-Performance Commercial Laptop Computers and 100 Desktop PCs for Government Office Deployment with 14-inch Full HD display, minimum 16GB RAM, 512GB NVMe SSD, Type-C Power Adaptor, and mandatory BIS CRS IS 13252 Security Compliance."
   );
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<any>(null);
@@ -165,7 +165,7 @@ export default function RecommendationsWorkspacePage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setKbFile(null);
-      setKbUploadSuccess(`Successfully indexed ${res.data?.data?.filename || "document"} into Qdrant.`);
+      setKbUploadSuccess(`Successfully parsed and indexed ${res.data?.data?.filename || "document"} into Qdrant.`);
       fetchKbJobs();
     } catch (err: any) {
       alert(err.response?.data?.detail || "Upload to Knowledge Base failed.");
@@ -197,10 +197,10 @@ export default function RecommendationsWorkspacePage() {
           <div className="flex items-center gap-2">
             <SearchCheck className="h-5 w-5 text-[#6f4e37]" />
             <h1 className="text-lg sm:text-xl font-bold text-[#3d2b1f] tracking-tight">
-              AI Standards Recommendations & BIS RAG Workspace
+              AI Recommendations & BIS Knowledge Base
             </h1>
           </div>
-          <p className="text-xs text-[#6f4e37]/85 mt-1">
+          <p className="text-xs text-[#6f4e37]/80 mt-0.5">
             Enterprise BIS Standards Retrieval, Specification PDF Upload Analysis, and Qdrant RAG Vector Ingestion.
           </p>
         </div>
@@ -208,17 +208,19 @@ export default function RecommendationsWorkspacePage() {
         {/* Tab Switcher */}
         <div className="flex bg-[#f8f5f0] p-1 rounded-md border border-[#c4a484]/50 self-start md:self-auto">
           <button
+            type="button"
             onClick={() => setActiveTab("recommendations")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
               activeTab === "recommendations"
                 ? "bg-[#6f4e37] text-[#f8f5f0] shadow-xs"
-                : "text-[#3d2b1f]/80 hover:text-[#3d2b1f] hover:bg-[#dfd5c3]/50"
+                : "text-[#3d2b1f]/80 hover:text-[#3d2b1f] hover:bg-[#ebe5d8]"
             }`}
           >
             <SearchCheck className="h-3.5 w-3.5" />
             AI Recommendations
           </button>
           <button
+            type="button"
             onClick={() => {
               setActiveTab("knowledge");
               fetchKbJobs();
@@ -226,7 +228,7 @@ export default function RecommendationsWorkspacePage() {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
               activeTab === "knowledge"
                 ? "bg-[#6f4e37] text-[#f8f5f0] shadow-xs"
-                : "text-[#3d2b1f]/80 hover:text-[#3d2b1f] hover:bg-[#dfd5c3]/50"
+                : "text-[#3d2b1f]/80 hover:text-[#3d2b1f] hover:bg-[#ebe5d8]"
             }`}
           >
             <Database className="h-3.5 w-3.5" />
@@ -242,18 +244,18 @@ export default function RecommendationsWorkspacePage() {
         <div className="space-y-5">
           {/* Input Mode Selector Card */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#c4a484]/30">
+            <CardHeader className="border-b border-[#c4a484]/30 pb-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                  <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-[#3d2b1f]">
                     <Search className="h-4 w-4 text-[#6f4e37]" />
                     Procurement Specification Input
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Choose to enter unstructured requirements or upload a procurement tender specification document.
+                    Choose to paste unstructured requirements or upload a procurement / tender specification PDF.
                   </CardDescription>
                 </div>
-                <div className="flex bg-[#ebe5d8] p-0.5 rounded-md border border-[#c4a484]/40 self-start">
+                <div className="flex bg-[#f8f5f0] p-1 rounded-md border border-[#c4a484]/50 self-start">
                   <button
                     type="button"
                     onClick={() => setInputMode("text")}
@@ -268,7 +270,7 @@ export default function RecommendationsWorkspacePage() {
                   <button
                     type="button"
                     onClick={() => setInputMode("pdf")}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition-all ${
                       inputMode === "pdf"
                         ? "bg-[#6f4e37] text-[#f8f5f0] font-semibold shadow-xs"
                         : "text-[#3d2b1f]/80 hover:text-[#3d2b1f]"
@@ -284,24 +286,20 @@ export default function RecommendationsWorkspacePage() {
             <CardContent className="pt-4">
               {inputMode === "text" ? (
                 /* Text Input Form */
-                <form onSubmit={handleGenerateText} className="space-y-4">
+                <form onSubmit={handleGenerateText} className="space-y-3.5">
                   <textarea
                     value={procurementInput}
                     onChange={(e) => setProcurementInput(e.target.value)}
                     rows={3}
-                    className="w-full rounded-md bg-[#f8f5f0] border border-[#c4a484]/60 p-3 text-xs sm:text-sm text-[#3d2b1f] placeholder:text-[#6f4e37]/50 focus:outline-none focus:border-[#6f4e37] focus:ring-1 focus:ring-[#6f4e37] resize-none font-sans"
+                    className="w-full rounded-md bg-[#f8f5f0] border border-[#c4a484]/60 p-3 text-xs sm:text-sm text-[#3d2b1f] placeholder-[#6f4e37]/50 focus:outline-none focus:border-[#6f4e37] focus:ring-1 focus:ring-[#6f4e37] resize-none font-sans"
                     placeholder="e.g., Procurement of LED street lights for municipal roads with minimum 10kV surge protection..."
                   />
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                    <div className="flex items-center gap-2 text-xs text-[#295030] font-medium">
-                      <span className="h-2 w-2 rounded-full bg-[#295030]" />
-                      Semantic Vector Retrieval & Clause Grounding Pipeline Active
+                    <div className="flex items-center gap-2 text-xs text-[#6f4e37]">
+                      <span className="h-2 w-2 rounded-full bg-[#295030] animate-pulse" />
+                      Gemini 2.5 Pro + Qdrant Vector Retrieval Pipeline Active
                     </div>
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="bg-[#6f4e37] hover:bg-[#3d2b1f] text-[#f8f5f0] gap-1.5"
-                    >
+                    <Button type="submit" disabled={isLoading} className="gap-2">
                       {isLoading ? (
                         <>
                           <Activity className="h-4 w-4 animate-spin" />
@@ -318,7 +316,7 @@ export default function RecommendationsWorkspacePage() {
                 </form>
               ) : (
                 /* PDF Upload Form */
-                <form onSubmit={handleUploadSpecPdf} className="space-y-4">
+                <form onSubmit={handleUploadSpecPdf} className="space-y-3.5">
                   <div
                     onClick={() => specFileInputRef.current?.click()}
                     onDragOver={(e) => {
@@ -331,7 +329,7 @@ export default function RecommendationsWorkspacePage() {
                       setIsDraggingSpec(false);
                       if (e.dataTransfer.files?.[0]) setSpecPdfFile(e.dataTransfer.files[0]);
                     }}
-                    className={`cursor-pointer border-2 border-dashed rounded-lg p-6 text-center space-y-2 transition-all ${
+                    className={`cursor-pointer border-2 border-dashed rounded-md p-6 text-center space-y-2 transition-all ${
                       isDraggingSpec
                         ? "border-[#6f4e37] bg-[#ebe5d8]"
                         : "border-[#c4a484]/60 hover:border-[#6f4e37] bg-[#f8f5f0]"
@@ -365,10 +363,10 @@ export default function RecommendationsWorkspacePage() {
                             setSpecPdfFile(null);
                             if (specFileInputRef.current) specFileInputRef.current.value = "";
                           }}
-                          className="text-[#6f4e37] hover:text-[#822424] p-1 transition-colors"
+                          className="text-[#6f4e37] hover:text-[#822424] p-1.5 transition-colors"
                           title="Remove file"
                         >
-                          <XCircle className="h-4 w-4" />
+                          <XCircle className="h-5 w-5" />
                         </button>
                       </div>
                     ) : (
@@ -377,12 +375,12 @@ export default function RecommendationsWorkspacePage() {
                         <div className="text-xs text-[#3d2b1f] font-semibold">
                           Click to Browse or Drag & Drop Tender / Spec Document
                         </div>
-                        <p className="text-[11px] text-[#6f4e37]/75">
+                        <p className="text-[11px] text-[#6f4e37]/80">
                           Supports official tender PDFs, BOQ technical schedules, and equipment specifications.
                         </p>
                         <div className="pt-1">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#ebe5d8] text-xs font-medium text-[#3d2b1f] border border-[#c4a484]/60 pointer-events-none">
-                            <Upload className="h-3 w-3 text-[#6f4e37]" /> Browse File
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#ebe5d8] text-xs font-medium text-[#3d2b1f] border border-[#c4a484]/50 pointer-events-none">
+                            <Upload className="h-3.5 w-3.5 text-[#6f4e37]" /> Browse File
                           </span>
                         </div>
                       </>
@@ -390,15 +388,11 @@ export default function RecommendationsWorkspacePage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                    <div className="text-xs text-[#6f4e37]/85 flex items-center gap-1.5">
-                      <FileText className="h-3.5 w-3.5 text-[#6f4e37]" />
+                    <div className="text-xs text-[#6f4e37] flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5" />
                       Automatic clause extraction & compliance evaluation
                     </div>
-                    <Button
-                      type="submit"
-                      disabled={!specPdfFile || isAnalyzingPdf}
-                      className="bg-[#6f4e37] hover:bg-[#3d2b1f] text-[#f8f5f0] gap-1.5"
-                    >
+                    <Button type="submit" disabled={!specPdfFile || isAnalyzingPdf} className="gap-2">
                       {isAnalyzingPdf ? (
                         <>
                           <Activity className="h-4 w-4 animate-spin" />
@@ -419,7 +413,7 @@ export default function RecommendationsWorkspacePage() {
 
           {/* Interactive Adaptive Clarification Engine Card */}
           {profile?.needs_clarification && (
-            <Card className="border-[#7d5017]/30 bg-[#faf3e8]">
+            <Card className="bg-[#faf3e8] border-[#7d5017]/30">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2 text-[#7d5017]">
@@ -430,15 +424,15 @@ export default function RecommendationsWorkspacePage() {
                     {profile.missing_parameters?.length || 0} Underspecified Parameter(s)
                   </Badge>
                 </div>
-                <CardDescription className="text-xs text-[#7d5017]/90">
+                <CardDescription className="text-xs text-[#7d5017]/85">
                   To ensure 100% precise, legally binding Indian Standards recommendations, click an option to refine your specification:
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 pt-2">
+              <CardContent className="space-y-2.5 pt-2">
                 {profile.clarification_questions?.map((q: any, idx: number) => (
-                  <div key={idx} className="p-3 rounded-md bg-white border border-[#c4a484]/40 space-y-2">
+                  <div key={idx} className="p-3 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 space-y-1.5">
                     <label className="text-xs font-semibold text-[#3d2b1f] block">{q.question}</label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {q.options?.map((opt: string, optIdx: number) => (
                         <button
                           key={optIdx}
@@ -447,10 +441,9 @@ export default function RecommendationsWorkspacePage() {
                             const newText = `${procurementInput.trim()} ${opt}.`;
                             setProcurementInput(newText);
                           }}
-                          className="px-2.5 py-1 rounded text-xs font-medium bg-[#f8f5f0] hover:bg-[#6f4e37] hover:text-[#f8f5f0] border border-[#c4a484]/50 text-[#3d2b1f] transition-all flex items-center gap-1"
+                          className="px-2.5 py-1 rounded text-xs font-medium bg-white hover:bg-[#ebe5d8] border border-[#c4a484] text-[#3d2b1f] transition-all flex items-center gap-1"
                         >
-                          <Plus className="h-3 w-3 text-[#6f4e37]" />
-                          {opt}
+                          + {opt}
                         </button>
                       ))}
                     </div>
@@ -462,8 +455,8 @@ export default function RecommendationsWorkspacePage() {
 
           {/* If Tender PDF was analyzed, display Document Summary & Compliance Score Breakdown */}
           {tenderAnalysis && (
-            <Card className="border-[#6f4e37]/30 bg-[#ebe5d8]/40">
-              <CardHeader className="pb-2">
+            <Card className="bg-[#ebe5d8] border-[#c4a484]/50">
+              <CardHeader className="pb-2 border-b border-[#c4a484]/30">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-[#3d2b1f]">
                     <FileCheck2 className="h-4 w-4 text-[#6f4e37]" />
@@ -474,14 +467,14 @@ export default function RecommendationsWorkspacePage() {
                     {Math.round(tenderAnalysis.compliance_score?.overall_score || 0)}%)
                   </Badge>
                 </div>
-                <CardDescription className="text-xs">
+                <CardDescription className="text-xs text-[#6f4e37]/80">
                   {tenderAnalysis.tender_profile?.title || "Tender Document Analysis"} •{" "}
                   {tenderAnalysis.tender_profile?.department || "Procurement Dept"}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 pt-2">
-                <div className="p-3 rounded-md bg-white border border-[#c4a484]/40 text-xs text-[#3d2b1f]">
-                  <span className="font-semibold text-[#3d2b1f] block mb-1">Extracted Scope:</span>
+              <CardContent className="space-y-3 pt-3">
+                <div className="p-3 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 text-xs text-[#3d2b1f]">
+                  <span className="font-semibold text-[#6f4e37] block mb-1">Extracted Scope:</span>
                   {tenderAnalysis.tender_profile?.scope_of_work}
                 </div>
                 {tenderAnalysis.detected_standards?.length > 0 && (
@@ -502,58 +495,62 @@ export default function RecommendationsWorkspacePage() {
           {profile && (
             <div className="space-y-5">
               {/* Audit & Confidence Overview Bar */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
-                <Card className="p-3.5">
-                  <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Product Category</span>
-                  <p className="text-xs sm:text-sm font-bold text-[#3d2b1f] mt-0.5 truncate">{profile.product_category}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <Card className="border-l-4 border-l-[#6f4e37]">
+                  <CardContent className="p-4">
+                    <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Product Category</span>
+                    <p className="text-xs sm:text-sm font-bold text-[#3d2b1f] mt-1 truncate">{profile.product_category}</p>
+                  </CardContent>
                 </Card>
 
-                <Card className="p-3.5">
-                  <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Domain Classification</span>
-                  <p className="text-xs sm:text-sm font-bold text-[#6f4e37] mt-0.5 truncate">{profile.domain}</p>
+                <Card className="border-l-4 border-l-[#c4a484]">
+                  <CardContent className="p-4">
+                    <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Domain Classification</span>
+                    <p className="text-xs sm:text-sm font-bold text-[#3d2b1f] mt-1">{profile.domain}</p>
+                  </CardContent>
                 </Card>
 
-                <Card className="p-3.5">
-                  <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Vector Similarity</span>
-                  <p className="text-xs sm:text-sm font-bold text-[#295030] mt-0.5 font-mono">
-                    {Math.round((profile.overall_confidence?.vector_similarity_score || 0.88) * 100)}%
-                  </p>
+                <Card className="border-l-4 border-l-[#295030]">
+                  <CardContent className="p-4">
+                    <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Vector Similarity</span>
+                    <p className="text-lg sm:text-xl font-bold text-[#295030] mt-1 font-mono">
+                      {Math.round((profile.overall_confidence?.vector_similarity_score || 0.88) * 100)}%
+                    </p>
+                  </CardContent>
                 </Card>
 
-                <Card className="p-3.5">
-                  <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Confidence Rating</span>
-                  <div className="mt-1">
-                    <ConfidenceBadge
-                      confidence={profile.overall_confidence?.overall_confidence || "HIGH"}
-                      score={profile.overall_confidence?.numeric_score || 0.9}
-                    />
-                  </div>
+                <Card className="border-l-4 border-l-[#3d2b1f]">
+                  <CardContent className="p-4">
+                    <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Confidence Rating</span>
+                    <div className="mt-1">
+                      <ConfidenceBadge
+                        confidence={profile.overall_confidence?.overall_confidence || "HIGH"}
+                        score={profile.overall_confidence?.numeric_score || 0.9}
+                      />
+                    </div>
+                  </CardContent>
                 </Card>
               </div>
 
               {/* Government Classification & Statutory Metadata Bar */}
               {(profile.sectional_committee || profile.suggested_hsn || profile.qco_enforced) && (
-                <div className="p-3.5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+                <div className="p-3.5 rounded-md bg-[#ebe5d8] border border-[#c4a484]/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
                   <div className="flex flex-wrap items-center gap-4 text-[#3d2b1f]">
                     {profile.sectional_committee && (
                       <div>
-                        <span className="text-[#6f4e37]/80 block text-[10px] uppercase font-semibold">
-                          BIS Sectional Committee
-                        </span>
+                        <span className="text-[#6f4e37] block text-[10px] uppercase font-semibold">BIS Sectional Committee</span>
                         <span className="font-semibold text-[#3d2b1f]">{profile.sectional_committee}</span>
                       </div>
                     )}
                     {profile.suggested_hsn && (
-                      <div className="border-l border-[#c4a484]/40 pl-4">
-                        <span className="text-[#6f4e37]/80 block text-[10px] uppercase font-semibold">
-                          Suggested HSN / SAC
-                        </span>
+                      <div className="border-l border-[#c4a484]/50 pl-4">
+                        <span className="text-[#6f4e37] block text-[10px] uppercase font-semibold">Suggested HSN / SAC</span>
                         <span className="font-mono text-[#295030] font-bold">{profile.suggested_hsn}</span>
                       </div>
                     )}
                   </div>
                   {profile.qco_enforced && (
-                    <Badge variant="danger" className="font-bold py-1 px-2.5 text-[10px] tracking-wide">
+                    <Badge variant="danger" className="font-bold py-0.5 px-2.5 text-[10px] tracking-wide">
                       GOVERNMENT QCO MANDATED
                     </Badge>
                   )}
@@ -562,10 +559,8 @@ export default function RecommendationsWorkspacePage() {
 
               {/* Statutory Legal Disclaimer */}
               {profile.statutory_disclaimer && (
-                <div className="p-3 rounded-lg bg-[#ebe5d8]/60 border border-[#c4a484]/40 text-[11px] text-[#3d2b1f] leading-relaxed">
-                  <span className="font-bold text-[#6f4e37] block mb-0.5">
-                    Government Procurement Rule 144(xi) GFR 2017 Notice:
-                  </span>
+                <div className="p-3 rounded-md bg-[#faf3e8] border border-[#7d5017]/30 text-[11px] text-[#7d5017] leading-relaxed">
+                  <span className="font-bold text-[#6f4e37] block mb-0.5">Government Procurement Rule 144(xi) GFR 2017 Notice:</span>
                   {profile.statutory_disclaimer}
                 </div>
               )}
@@ -591,21 +586,21 @@ export default function RecommendationsWorkspacePage() {
               {/* Documentation Requirements */}
               {profile.categorized_standards?.documentation_requirements && (
                 <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-[#6f4e37]" />
+                  <CardHeader className="border-b border-[#c4a484]/30 pb-3">
+                    <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-[#3d2b1f]">
+                      <FileText className="h-4 w-4 text-[#295030]" />
                       Mandatory Documentation & Testing Audit Requirements
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs text-[#3d2b1f]">
+                  <CardContent className="pt-4">
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-[#3d2b1f]">
                       {profile.categorized_standards.documentation_requirements.map((doc: string, idx: number) => (
                         <li
                           key={idx}
-                          className="p-2.5 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 flex items-center gap-2"
+                          className="p-3 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 flex items-center gap-2.5"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5 text-[#295030] shrink-0" />
-                          <span>{doc}</span>
+                          <CheckCircle2 className="h-4 w-4 text-[#295030] shrink-0" />
+                          {doc}
                         </li>
                       ))}
                     </ul>
@@ -614,7 +609,7 @@ export default function RecommendationsWorkspacePage() {
               )}
 
               {/* Officer Review Action Bar */}
-              <div className="p-4 sm:p-5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="p-5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xs sm:text-sm font-bold text-[#3d2b1f] flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-[#6f4e37]" />
@@ -624,34 +619,34 @@ export default function RecommendationsWorkspacePage() {
                     Review recommended compliance profile before attaching to official tender BOQ specification.
                   </p>
                   {reviewStatus && (
-                    <p className="text-xs font-semibold text-[#295030] mt-1 flex items-center gap-1">
-                      <Check className="h-3.5 w-3.5" /> Review Status Committed as: {reviewStatus}
+                    <p className="text-xs font-semibold text-[#295030] mt-1">
+                      ✓ Review Status Committed as: {reviewStatus}
                     </p>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleOfficerReview("REJECTED")}
-                    className="border-[#822424]/40 text-[#822424] hover:bg-[#f9ecec] gap-1"
+                    className="border-[#822424]/40 text-[#822424] hover:bg-[#f9ecec] gap-1.5 text-xs"
                   >
-                    <XCircle className="h-3.5 w-3.5" /> Reject Profile
+                    <XCircle className="h-4 w-4" /> Reject Profile
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleOfficerReview("MODIFIED")}
-                    className="border-[#7d5017]/40 text-[#7d5017] hover:bg-[#faf3e8] gap-1"
+                    className="border-[#7d5017]/40 text-[#7d5017] hover:bg-[#faf3e8] gap-1.5 text-xs"
                   >
-                    <Edit3 className="h-3.5 w-3.5" /> Modify & Approve
+                    <Edit3 className="h-4 w-4" /> Modify & Approve
                   </Button>
                   <Button
                     size="sm"
                     onClick={() => handleOfficerReview("APPROVED")}
-                    className="bg-[#295030] hover:bg-[#1e3c23] text-white gap-1"
+                    className="gap-1.5 text-xs"
                   >
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Approve Recommendations
+                    <CheckCircle2 className="h-4 w-4" /> Approve Recommendations
                   </Button>
                 </div>
               </div>
@@ -669,16 +664,16 @@ export default function RecommendationsWorkspacePage() {
       {activeTab === "knowledge" && (
         <div className="space-y-5">
           {/* Vector DB Health Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-l-4 border-l-[#6f4e37]">
-              <CardHeader className="pb-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            <Card className="border-l-4 border-l-[#295030]">
+              <CardHeader className="pb-2">
                 <CardDescription className="text-[10px] uppercase font-semibold text-[#6f4e37]">
                   Qdrant Vector Store
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-lg font-bold text-[#3d2b1f] flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-[#295030]" /> Connected
+                <div className="text-lg font-bold text-[#3d2b1f] flex items-center gap-2">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-[#295030]" /> Connected
                 </div>
                 <span className="text-[11px] text-[#6f4e37]/80 mt-0.5 block font-mono">
                   Collection: bis_standards_chunks
@@ -686,31 +681,27 @@ export default function RecommendationsWorkspacePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-[#c4a484]">
-              <CardHeader className="pb-1">
+            <Card className="border-l-4 border-l-[#6f4e37]">
+              <CardHeader className="pb-2">
                 <CardDescription className="text-[10px] uppercase font-semibold text-[#6f4e37]">
                   Embedding Dimension
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-lg font-bold text-[#3d2b1f]">768-dim</div>
-                <span className="text-[11px] text-[#6f4e37]/80 mt-0.5 block">
-                  Google Gemini / text-embedding-004
-                </span>
+                <div className="text-lg font-bold text-[#3d2b1f] font-mono">768-dim</div>
+                <span className="text-[11px] text-[#6f4e37]/80 mt-0.5 block">Google Gemini / text-embedding-004</span>
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-[#295030]">
-              <CardHeader className="pb-1">
+            <Card className="border-l-4 border-l-[#c4a484]">
+              <CardHeader className="pb-2">
                 <CardDescription className="text-[10px] uppercase font-semibold text-[#6f4e37]">
                   Vector Retrieval Strategy
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-lg font-bold text-[#3d2b1f]">HNSW + RRF</div>
-                <span className="text-[11px] text-[#6f4e37]/80 mt-0.5 block">
-                  Cosine Distance | Reciprocal Rank Fusion
-                </span>
+                <span className="text-[11px] text-[#6f4e37]/80 mt-0.5 block">Cosine Distance | Reciprocal Rank Fusion</span>
               </CardContent>
             </Card>
           </div>
@@ -718,8 +709,8 @@ export default function RecommendationsWorkspacePage() {
           {/* BIS Standard PDF Upload Form for RAG Indexing */}
           <Card>
             <CardHeader className="border-b border-[#c4a484]/30 pb-3">
-              <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                <Database className="h-4 w-4 text-[#6f4e37]" />
+              <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-[#3d2b1f]">
+                <Database className="h-4.5 w-4.5 text-[#6f4e37]" />
                 Index Official BIS Standard PDF into RAG Vector Store
               </CardTitle>
               <CardDescription className="text-xs">
@@ -728,7 +719,7 @@ export default function RecommendationsWorkspacePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
-              <form onSubmit={handleKbUpload} className="space-y-4">
+              <form onSubmit={handleKbUpload} className="space-y-3.5">
                 <div
                   onClick={() => kbFileInputRef.current?.click()}
                   onDragOver={(e) => {
@@ -741,7 +732,7 @@ export default function RecommendationsWorkspacePage() {
                     setIsDraggingKb(false);
                     if (e.dataTransfer.files?.[0]) setKbFile(e.dataTransfer.files[0]);
                   }}
-                  className={`cursor-pointer border-2 border-dashed rounded-lg p-6 text-center space-y-2 transition-all ${
+                  className={`cursor-pointer border-2 border-dashed rounded-md p-6 text-center space-y-2 transition-all ${
                     isDraggingKb
                       ? "border-[#6f4e37] bg-[#ebe5d8]"
                       : "border-[#c4a484]/60 hover:border-[#6f4e37] bg-[#f8f5f0]"
@@ -763,7 +754,7 @@ export default function RecommendationsWorkspacePage() {
                           <p className="text-xs font-semibold text-[#3d2b1f] truncate max-w-[280px] sm:max-w-md">
                             {kbFile.name}
                           </p>
-                          <p className="text-[10px] text-[#6f4e37]/80">
+                          <p className="text-[10px] text-[#6f4e37]/80 font-mono">
                             {(kbFile.size / 1024).toFixed(1)} KB • Click or drop another to replace
                           </p>
                         </div>
@@ -775,10 +766,10 @@ export default function RecommendationsWorkspacePage() {
                           setKbFile(null);
                           if (kbFileInputRef.current) kbFileInputRef.current.value = "";
                         }}
-                        className="text-[#6f4e37] hover:text-[#822424] p-1 transition-colors"
+                        className="text-[#6f4e37] hover:text-[#822424] p-1.5 transition-colors"
                         title="Remove file"
                       >
-                        <XCircle className="h-4 w-4" />
+                        <XCircle className="h-5 w-5" />
                       </button>
                     </div>
                   ) : (
@@ -787,12 +778,12 @@ export default function RecommendationsWorkspacePage() {
                       <div className="text-xs text-[#3d2b1f] font-semibold">
                         Click to Browse or Drag & Drop BIS Standard PDF file
                       </div>
-                      <p className="text-[11px] text-[#6f4e37]/75">
+                      <p className="text-[11px] text-[#6f4e37]/80">
                         Upload official BIS standard PDFs for automated clause extraction, semantic chunking, and Qdrant indexing.
                       </p>
                       <div className="pt-1">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#ebe5d8] text-xs font-medium text-[#3d2b1f] border border-[#c4a484]/60 pointer-events-none">
-                          <Upload className="h-3 w-3 text-[#6f4e37]" /> Browse PDF File
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#ebe5d8] text-xs font-medium text-[#3d2b1f] border border-[#c4a484]/50 pointer-events-none">
+                          <Upload className="h-3.5 w-3.5 text-[#6f4e37]" /> Browse PDF File
                         </span>
                       </div>
                     </>
@@ -815,17 +806,13 @@ export default function RecommendationsWorkspacePage() {
                 </div>
 
                 {kbUploadSuccess && (
-                  <div className="p-3 rounded-md bg-[#eef3ee] border border-[#295030]/30 text-xs text-[#295030] flex items-center gap-2">
+                  <div className="p-3 rounded-md bg-[#eef3ee] border border-[#295030]/25 text-xs text-[#295030] flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 shrink-0" />
                     {kbUploadSuccess}
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={!kbFile || isKbUploading}
-                  className="w-full bg-[#6f4e37] hover:bg-[#3d2b1f] text-[#f8f5f0] gap-2"
-                >
+                <Button type="submit" disabled={!kbFile || isKbUploading} className="w-full gap-2">
                   {isKbUploading ? (
                     <>
                       <Activity className="h-4 w-4 animate-spin" />
@@ -843,30 +830,25 @@ export default function RecommendationsWorkspacePage() {
           </Card>
 
           {/* Ingestion Jobs History Table */}
-          <Card className="overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-[#c4a484]/30 pb-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#c4a484]/30">
               <div>
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-[#6f4e37]" />
+                <CardTitle className="text-sm sm:text-base flex items-center gap-2 text-[#3d2b1f]">
+                  <FileText className="h-4.5 w-4.5 text-[#6f4e37]" />
                   Recent Ingestion Jobs
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Track document parsing, semantic chunking, and embedding generation in Qdrant.
                 </CardDescription>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={fetchKbJobs}
-                className="gap-1 text-xs h-7 border-[#c4a484] hover:bg-[#ebe5d8] text-[#3d2b1f]"
-              >
-                <RefreshCw className={`h-3 w-3 ${isKbLoading ? "animate-spin" : ""}`} />
+              <Button variant="outline" size="sm" onClick={fetchKbJobs} className="gap-1.5 text-xs border-[#c4a484] text-[#3d2b1f]">
+                <RefreshCw className={`h-3.5 w-3.5 ${isKbLoading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
             </CardHeader>
             <CardContent className="p-0">
               {isKbLoading && kbJobs.length === 0 ? (
-                <div className="py-8 text-center text-xs text-[#6f4e37]/70">
+                <div className="py-8 text-center text-xs text-[#6f4e37]/70 animate-pulse">
                   Loading ingestion history...
                 </div>
               ) : kbJobs.length === 0 ? (
@@ -877,26 +859,24 @@ export default function RecommendationsWorkspacePage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#ebe5d8] text-[10px] font-semibold text-[#6f4e37] uppercase border-b border-[#c4a484]/30">
-                        <th className="py-2.5 px-3">Filename</th>
-                        <th className="py-2.5 px-3">Detected IS Number</th>
-                        <th className="py-2.5 px-3">Chunks Extracted</th>
-                        <th className="py-2.5 px-3">Qdrant Vectors</th>
-                        <th className="py-2.5 px-3 text-right">Status</th>
+                      <tr className="border-b border-[#c4a484]/30 text-[10px] font-semibold text-[#6f4e37] uppercase bg-[#ebe5d8]">
+                        <th className="py-2.5 px-3.5">Filename</th>
+                        <th className="py-2.5 px-3.5">Detected IS Number</th>
+                        <th className="py-2.5 px-3.5">Chunks Extracted</th>
+                        <th className="py-2.5 px-3.5">Qdrant Vectors</th>
+                        <th className="py-2.5 px-3.5">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#c4a484]/20 text-xs">
                       {kbJobs.map((job) => (
                         <tr key={job.id} className="hover:bg-[#ebe5d8]/40 transition-colors">
-                          <td className="py-2.5 px-3 font-semibold text-[#3d2b1f] flex items-center gap-2">
-                            <FileText className="h-3.5 w-3.5 text-[#6f4e37]" /> {job.filename}
+                          <td className="py-3 px-3.5 font-semibold text-[#3d2b1f] flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-[#6f4e37]" /> {job.filename}
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-[#6f4e37] font-mono">
-                            {job.is_number || "Pending"}
-                          </td>
-                          <td className="py-2.5 px-3 text-[#3d2b1f]/80 font-mono">{job.chunks_count}</td>
-                          <td className="py-2.5 px-3 text-[#3d2b1f]/80 font-mono">{job.vectors_count}</td>
-                          <td className="py-2.5 px-3 text-right">
+                          <td className="py-3 px-3.5 font-bold text-[#6f4e37] font-mono">{job.is_number || "Pending"}</td>
+                          <td className="py-3 px-3.5 text-[#3d2b1f] font-mono">{job.chunks_count}</td>
+                          <td className="py-3 px-3.5 text-[#3d2b1f] font-mono">{job.vectors_count}</td>
+                          <td className="py-3 px-3.5">
                             <Badge
                               variant={
                                 job.status === "COMPLETED"
