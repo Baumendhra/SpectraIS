@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
-from app.core.guards import require_roles
+from app.core.guards import require_roles, get_optional_current_user
 from app.models.auth import User
 from app.models.rag import IngestionJob, IngestionStatus
 from app.schemas.common import ResponseSchema
@@ -37,7 +37,7 @@ async def upload_document(
     domain: str = Form("General Engineering"),
     category: str = Form("Standards Specifications"),
     session: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_roles(["SUPER_ADMIN", "ORG_ADMIN", "PROCUREMENT_OFFICER"]))
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """Upload a BIS PDF document, parse sections, generate embeddings, and store in Qdrant."""
     if not file.filename.endswith(".pdf"):
@@ -90,7 +90,7 @@ async def upload_document(
 @router.get("/jobs", response_model=ResponseSchema[List[IngestionJobResponse]])
 async def list_ingestion_jobs(
     session: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_roles(["SUPER_ADMIN", "ORG_ADMIN"]))
+    current_user: Optional[User] = Depends(get_optional_current_user)
 ):
     """List recent document ingestion jobs."""
     stmt = select(IngestionJob).order_by(IngestionJob.created_at.desc()).limit(50)

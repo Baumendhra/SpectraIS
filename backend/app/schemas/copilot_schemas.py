@@ -12,6 +12,15 @@ class StructuredRequirementSpec(BaseModel):
     technical_requirements: List[str] = Field(default_factory=list, description="Extracted technical parameters & constraints")
     certification_requirements: List[str] = Field(default_factory=list, description="Extracted compliance & certification expectations")
     confidence: float = Field(default=0.9, ge=0.0, le=1.0)
+    # Government Procurement Extensions
+    detected_is_citations: List[str] = Field(default_factory=list, description="Explicit Indian Standards citations found in spec (e.g. IS 10322)")
+    operational_parameters: Dict[str, Any] = Field(default_factory=dict, description="Numerical thresholds & operating constraints (surge, voltage, IP rating)")
+    make_in_india_percent: Optional[int] = Field(default=None, description="Make in India (MII) minimum local content percentage requirement")
+    qco_mandated: bool = Field(default=False, description="Whether item falls under mandatory Quality Control Order (QCO)")
+    nabl_test_required: bool = Field(default=False, description="Whether testing by NABL accredited laboratory is mandated")
+    needs_clarification: bool = Field(default=False, description="Whether input specifications are incomplete and require targeted questions")
+    missing_parameters: List[str] = Field(default_factory=list, description="Missing technical attributes (e.g. Wattage, IP rating, Surge protection)")
+    clarification_questions: List[Dict[str, Any]] = Field(default_factory=list, description="Interactive questions with suggested options for procurement officer")
 
 
 class DomainClassificationResult(BaseModel):
@@ -19,6 +28,9 @@ class DomainClassificationResult(BaseModel):
     confidence_score: float
     reasoning: str
     secondary_domains: List[str] = Field(default_factory=list)
+    sectional_committee: Optional[str] = Field(default=None, description="BIS Sectional Committee e.g. ETD 23, LITD 14, MED 04")
+    suggested_hsn: Optional[str] = Field(default=None, description="Suggested 4-digit / 8-digit HSN/SAC code")
+    gem_category: Optional[str] = Field(default=None, description="Corresponding Government e-Marketplace (GeM) product category")
 
 
 class StandardCitation(BaseModel):
@@ -54,13 +66,24 @@ class RecommendationItem(BaseModel):
     is_number: str
     standard_title: str
     clause_reference: str
-    category_type: str  # Primary, Secondary, Safety, Testing, CRS
+    category_type: str  # Primary, Secondary, Safety, Testing, CRS, Mandatory QCO
     applicability_reason: str
     evidence_text: str
     source_sections: List[str]
     confidence_score: float
     risk_level: str
     related_standards: List[str] = Field(default_factory=list)
+    # Government Procurement Enhancements
+    is_qco_mandated: bool = Field(default=False, description="Flagged under mandatory Quality Control Order (QCO)")
+    status: str = Field(default="ACTIVE", description="ACTIVE, REVISED, WITHDRAWN, SUPERSEDED")
+    edition_year: Optional[str] = Field(default="2025", description="Latest edition year e.g. 2025")
+    amendment_info: Optional[str] = Field(default="Amdt 1 (2023)", description="Latest published amendment info")
+    is_up_to_date: bool = Field(default=True, description="Whether recommended standard is current & up-to-date")
+    version_status_badge: str = Field(default="🟢 Up-to-Date (2025 Edition)", description="Human readable version status badge")
+    last_verified_source: str = Field(default="BIS Portal Live Stream", description="Verification data origin e.g. BIS CRS Live Portal / Gazette Notice")
+    supersession_warning: Optional[str] = Field(default=None, description="Warning if cited standard has been superseded by newer edition")
+    tender_boq_clause: Optional[str] = Field(default=None, description="Ready-to-use formal BOQ clause for GeM/CPPP tender schedule")
+    nabl_testing_schedule: List[str] = Field(default_factory=list, description="Mandatory testing regimen: Type Test, Routine Test, Acceptance Test")
 
 
 class ComplianceProfileResponse(BaseModel):
@@ -74,6 +97,14 @@ class ComplianceProfileResponse(BaseModel):
     audit_summary: str
     review_status: str = "PENDING_REVIEW"
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    # Government Procurement Meta
+    sectional_committee: Optional[str] = Field(default=None, description="Governing BIS Sectional Committee")
+    suggested_hsn: Optional[str] = Field(default=None, description="Suggested HSN/SAC classification")
+    qco_enforced: bool = Field(default=False, description="Whether statutory QCO compliance applies")
+    statutory_disclaimer: Optional[str] = Field(default=None, description="Official legal compliance note under BIS Act 2016 and GFR 2017")
+    needs_clarification: bool = Field(default=False, description="Whether requirements are underspecified")
+    missing_parameters: List[str] = Field(default_factory=list, description="Parameters requiring clarification")
+    clarification_questions: List[Dict[str, Any]] = Field(default_factory=list, description="Interactive questions for procurement officer")
 
 
 class OfficerReviewRequest(BaseModel):

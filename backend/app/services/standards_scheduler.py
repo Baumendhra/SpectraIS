@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.standards import Standard, StandardStatus, CertificationRequirement
 from app.services.bis_scraper import BISWebScraper
+from app.services.chunking_service import BISChunkingService
+from app.services.embedding_service import EmbeddingService
 
 logger = logging.getLogger(__name__)
 
@@ -73,12 +75,31 @@ class StandardsSchedulerService:
                 updated_count += 1
 
         await self.session.commit()
+
+        # After commit, embed any newly inserted standards into Qdrant
+        embedded_count = 0
+        if inserted_count > 0:
+            # Re-query the standards we just inserted to get their IDs
+            stmt = select(Standard).order_by(Standard.created_at.desc()).limit(inserted_count)
+            result = await self.session.execute(stmt)
+            new_standards = result.scalars().all()
+            
+            for std in new_standards:
+                text = f"{std.is_number} - {std.title}\n\nScope: {std.scope or ''}\nCategory: {std.category or ''}\nKeywords: {', '.join(std.keywords or [])}"
+                chunks = BISChunkingService.chunk_document(
+                    parsed_doc={"is_number": std.is_number, "title": std.title, "sections": [{"section_type": "REQUIREMENTS", "content": text}]},
+                    domain=std.domain or "General",
+                    category=std.category or "Standards"
+                )
+                n = await EmbeddingService.index_chunks(chunks)
+                embedded_count += n
         
         summary = {
             "total_scraped": len(scraped_data),
             "inserted": inserted_count,
             "updated": updated_count,
             "revised_flagged": revised_flagged_count,
+            "vectors_embedded": embedded_count,
             "timestamp": date.today().isoformat()
         }
         logger.info(f"Ingestion job completed successfully: {summary}")

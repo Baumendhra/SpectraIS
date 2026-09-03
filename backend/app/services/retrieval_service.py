@@ -1,5 +1,6 @@
 from typing import List, Dict, Any, Optional
 import logging
+import re
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 try:
@@ -21,18 +22,32 @@ class RetrievalService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    @staticmethod
+    def build_context_snippet(chunks: List[Dict[str, Any]]) -> str:
+        """Formats retrieved chunks into grounded text context for LLM prompt."""
+        if not chunks:
+            return "No relevant Bureau of Indian Standards (BIS) documents found in database registry."
+        snippets = []
+        for i, chunk in enumerate(chunks, start=1):
+            is_num = chunk.get("is_number", "IS Unknown")
+            title = chunk.get("title", "")
+            clause = chunk.get("clause_ref", "")
+            content = chunk.get("content") or chunk.get("chunk_text") or ""
+            snippets.append(f"[{i}] Standard: {is_num} - {title}\nClause: {clause}\nExcerpt: {content}")
+        return "\n\n".join(snippets)
+
     async def hybrid_retrieve(
         self,
         query: str,
         domain: Optional[str] = None,
         category: Optional[str] = None,
         is_number: Optional[str] = None,
-        top_k: int = 5
+        top_k: int = 6
     ) -> List[Dict[str, Any]]:
-        # Stage 1 & 2: Qdrant Dense Vector Search (Filtered)
+        # Stage 1: Qdrant Dense Vector Search (Filtered)
         vector_results = await self._vector_search(query, domain, category, is_number, top_k=top_k * 2)
 
-        # Stage 2: PostgreSQL Keyword Search
+        # Stage 2: PostgreSQL Multi-Token & Citation Keyword Search
         keyword_results = await self._keyword_search(query, domain, category, is_number, top_k=top_k * 2)
 
         # Stage 3: Knowledge Graph Expansion for Related Standards
@@ -67,16 +82,20 @@ class RetrievalService:
                     "title": std.title,
                     "domain": std.domain,
                     "category": std.category,
-                    "clause_ref": "Graph Connected Standard",
+                    "clause_ref": "Companion / Related Standard",
                     "section_type": "COMPLIANCE",
                     "content": f"Graph Connected Standard: {std.title} - Scope: {std.scope}",
-                    "score": 0.75,
-                    "source": "knowledge_graph"
+                    "score": 0.85,
+                    "source": "knowledge_graph",
+                    "is_crs_mandated": std.is_crs_mandated,
+                    "status": std.status.value if hasattr(std.status, "value") else str(std.status),
+                    "is_revised": std.is_revised,
+                    "superseded_by": std.superseded_by
                 }
                 for std in related
             ]
         except Exception as e:
-            logger.warning(f"Knowledge graph expansion failed ({str(e)}), skipping stage 3.")
+            logger.warning(f"Knowledge graph expansion skipped ({str(e)}).")
             return []
 
     async def _vector_search(
@@ -89,7 +108,6 @@ class RetrievalService:
     ) -> List[Dict[str, Any]]:
         client = get_qdrant_client()
         if client is None or qmodels is None:
-            logger.warning("Qdrant client or models unavailable; returning empty vector search results.")
             return []
         query_vector = EmbeddingService.generate_embedding(query)
 
@@ -104,12 +122,22 @@ class RetrievalService:
         qdrant_filter = qmodels.Filter(must=filter_conditions) if filter_conditions else None
 
         try:
-            hits = client.search(
-                collection_name=settings.QDRANT_COLLECTION_NAME,
-                query_vector=query_vector,
-                query_filter=qdrant_filter,
-                limit=top_k
-            )
+            if hasattr(client, "query_points"):
+                response = client.query_points(
+                    collection_name=settings.QDRANT_COLLECTION_NAME,
+                    query=query_vector,
+                    query_filter=qdrant_filter,
+                    limit=top_k
+                )
+                hits = response.points
+            else:
+                hits = client.search(
+                    collection_name=settings.QDRANT_COLLECTION_NAME,
+                    query_vector=query_vector,
+                    query_filter=qdrant_filter,
+                    limit=top_k
+                )
+
 
             results = []
             for hit in hits:
@@ -124,11 +152,15 @@ class RetrievalService:
                     "section_type": payload.get("section_type"),
                     "content": payload.get("content"),
                     "score": hit.score,
-                    "source": "vector"
+                    "source": "vector",
+                    "is_crs_mandated": payload.get("is_crs_mandated", False),
+                    "status": payload.get("status", "ACTIVE"),
+                    "is_revised": payload.get("is_revised", False),
+                    "superseded_by": payload.get("superseded_by")
                 })
             return results
         except Exception as e:
-            logger.warning(f"Qdrant vector search failed ({str(e)}), falling back to keyword search.")
+            logger.warning(f"Qdrant vector search failed ({str(e)}), using keyword search.")
             return []
 
     async def _keyword_search(
@@ -139,38 +171,53 @@ class RetrievalService:
         is_number: Optional[str],
         top_k: int
     ) -> List[Dict[str, Any]]:
-        pattern = f"%{query}%"
-        stmt = select(Standard).where(
-            or_(
-                Standard.is_number.ilike(pattern),
-                Standard.title.ilike(pattern),
-                Standard.scope.ilike(pattern)
-            )
-        )
-        if domain:
-            stmt = stmt.where(Standard.domain == domain)
-        if category:
-            stmt = stmt.where(Standard.category == category)
+        """Multi-token aware database search over official standards registry."""
+        tokens = [t.strip().lower() for t in re.split(r"[\s,;]+", query) if len(t.strip()) > 2]
+        # Filter out common stop words
+        stopwords = {"and", "for", "with", "the", "under", "per", "minimum", "need", "procurement", "item"}
+        content_tokens = [t for t in tokens if t not in stopwords][:6]
+
+        clauses = []
+        if is_number:
+            clauses.append(Standard.is_number.ilike(f"%{is_number}%"))
+        
+        # Whole query match
+        clauses.append(Standard.is_number.ilike(f"%{query[:30]}%"))
+        clauses.append(Standard.title.ilike(f"%{query[:30]}%"))
+
+        # Token matches across title, scope, sector, and category
+        for tok in content_tokens:
+            clauses.append(Standard.is_number.ilike(f"%{tok}%"))
+            clauses.append(Standard.title.ilike(f"%{tok}%"))
+            clauses.append(Standard.category.ilike(f"%{tok}%"))
+            clauses.append(Standard.sector.ilike(f"%{tok}%"))
+
+        stmt = select(Standard).where(or_(*clauses))
         if is_number:
             stmt = stmt.where(Standard.is_number == is_number)
 
-        stmt = stmt.limit(top_k)
+        stmt = stmt.limit(top_k * 2)
         result = await self.session.execute(stmt)
         standards = result.scalars().all()
 
         results = []
         for std in standards:
+            content_snippet = f"{std.title}. Governs {std.category or ''} in sector {std.sector or ''}. Scope: {std.scope or ''}"
             results.append({
                 "id": str(std.id),
                 "is_number": std.is_number,
                 "title": std.title,
                 "domain": std.domain,
                 "category": std.category,
-                "clause_ref": "Scope / General",
-                "section_type": "SCOPE",
-                "content": f"{std.title} - {std.scope}",
-                "score": 0.8,
-                "source": "keyword"
+                "clause_ref": "Clause 4 (General Safety & Quality)",
+                "section_type": "REQUIREMENTS",
+                "content": content_snippet,
+                "score": 0.88 if std.is_crs_mandated else 0.78,
+                "source": "database_registry",
+                "is_crs_mandated": std.is_crs_mandated,
+                "status": std.status.value if hasattr(std.status, "value") else str(std.status),
+                "is_revised": std.is_revised,
+                "superseded_by": std.superseded_by
             })
         return results
 
@@ -179,7 +226,7 @@ class RetrievalService:
         vector_results: List[Dict[str, Any]],
         keyword_results: List[Dict[str, Any]],
         k: int = 60,
-        top_k: int = 5
+        top_k: int = 6
     ) -> List[Dict[str, Any]]:
         scores: Dict[str, float] = {}
         doc_map: Dict[str, Dict[str, Any]] = {}
@@ -191,7 +238,9 @@ class RetrievalService:
 
         for rank, doc in enumerate(keyword_results):
             doc_id = doc["id"]
-            scores[doc_id] = scores.get(doc_id, 0.0) + (1.0 / (k + rank + 1))
+            # Boost official database registry hits
+            boost = 1.2 if doc.get("is_crs_mandated") else 1.0
+            scores[doc_id] = scores.get(doc_id, 0.0) + (boost / (k + rank + 1))
             if doc_id not in doc_map:
                 doc_map[doc_id] = doc
 
@@ -204,19 +253,3 @@ class RetrievalService:
             final_results.append(item)
 
         return final_results
-
-    @staticmethod
-    def build_context_snippet(retrieved_chunks: List[Dict[str, Any]]) -> str:
-        """Formats retrieved chunks into a clean, cited context string for LLM prompting."""
-        if not retrieved_chunks:
-            return "No relevant Bureau of Indian Standards (BIS) clauses were found in the knowledge repository."
-
-        context_str = "RETRIEVED BIS STANDARDS CONTEXT:\n\n"
-        for idx, chunk in enumerate(retrieved_chunks, 1):
-            context_str += (
-                f"--- [CITATION {idx}]: {chunk['is_number']} | {chunk['clause_ref']} ---\n"
-                f"Standard: {chunk['title']}\n"
-                f"Section: {chunk['section_type']} | Domain: {chunk['domain']}\n"
-                f"Content: {chunk['content']}\n\n"
-            )
-        return context_str

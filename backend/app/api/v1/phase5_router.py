@@ -1,6 +1,8 @@
 import logging
 from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.database import get_db
 
 from app.schemas.phase5_schemas import (
     GovAdapterConfig,
@@ -43,10 +45,13 @@ async def sync_gov_portal(system_name: str = "GeM"):
 
 
 @router.post("/amendments/process", response_model=ImpactAnalysisResult)
-async def process_amendment(notice: BISAmendmentUpdate):
+async def process_amendment(
+    notice: BISAmendmentUpdate,
+    db: AsyncSession = Depends(get_db)
+):
     """Ingests a new BIS Gazette amendment notice and returns downstream impact analysis."""
     try:
-        await BISAmendmentIntelligenceService.process_amendment_notice(notice)
+        await BISAmendmentIntelligenceService.process_amendment_notice(notice, db)
         return AmendmentImpactAnalysisEngine.analyze_impact(notice)
     except Exception as e:
         logger.error(f"Amendment processing failed: {str(e)}")

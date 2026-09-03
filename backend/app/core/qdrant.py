@@ -1,5 +1,6 @@
-from typing import Optional, List, Dict, Any
+import os
 import logging
+from typing import Optional, Any
 
 try:
     from qdrant_client import QdrantClient  # type: ignore
@@ -7,14 +8,6 @@ try:
 except (ImportError, ModuleNotFoundError):
     QdrantClient = None  # type: ignore
     qmodels = None  # type: ignore
-
-try:
-    from qdrant_client.http.exceptions import UnexpectedResponse  # type: ignore
-except (ImportError, ModuleNotFoundError):
-    try:
-        from qdrant_client.exceptions import UnexpectedResponse  # type: ignore
-    except (ImportError, ModuleNotFoundError):
-        UnexpectedResponse = Exception  # type: ignore
 
 from app.core.config import settings
 
@@ -30,15 +23,31 @@ def get_qdrant_client() -> Optional[Any]:
         return None
 
     if qdrant_client is None:
+        # First attempt connecting to network Qdrant instance (e.g. Docker localhost:6333)
         try:
-            qdrant_client = QdrantClient(
+            client = QdrantClient(
                 host=settings.QDRANT_HOST,
                 port=settings.QDRANT_PORT,
-                timeout=10.0
+                timeout=2.0
             )
+            # Test connectivity
+            client.get_collections()
+            qdrant_client = client
+            logger.info(f"Connected to remote Qdrant at {settings.QDRANT_HOST}:{settings.QDRANT_PORT}")
+            return qdrant_client
+        except Exception:
+            logger.info("Remote Qdrant unavailable; initializing embedded local disk storage for zero-dependency RAG.")
+
+        # Fallback: Embedded local disk vector store
+        try:
+            storage_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "data", "qdrant_storage")
+            os.makedirs(storage_dir, exist_ok=True)
+            qdrant_client = QdrantClient(path=storage_dir)
+            logger.info(f"Initialized embedded local Qdrant vector database at: {storage_dir}")
         except Exception as e:
-            logger.error(f"Failed to initialize QdrantClient: {str(e)}")
+            logger.error(f"Failed to initialize embedded QdrantClient: {str(e)}")
             return None
+
     return qdrant_client
 
 
@@ -74,26 +83,15 @@ def init_qdrant_collections():
             )
 
             # Create payload indexes for fast filtered vector searches
-            client.create_payload_index(
-                collection_name=collection_name,
-                field_name="is_number",
-                field_schema=qmodels.PayloadSchemaType.KEYWORD
-            )
-            client.create_payload_index(
-                collection_name=collection_name,
-                field_name="domain",
-                field_schema=qmodels.PayloadSchemaType.KEYWORD
-            )
-            client.create_payload_index(
-                collection_name=collection_name,
-                field_name="category",
-                field_schema=qmodels.PayloadSchemaType.KEYWORD
-            )
-            client.create_payload_index(
-                collection_name=collection_name,
-                field_name="section_type",
-                field_schema=qmodels.PayloadSchemaType.KEYWORD
-            )
+            for field in ["is_number", "domain", "category", "section_type"]:
+                try:
+                    client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name=field,
+                        field_schema=qmodels.PayloadSchemaType.KEYWORD
+                    )
+                except Exception:
+                    pass
             logger.info(f"Successfully initialized collection '{collection_name}' with payload indexes.")
     except Exception as e:
-        logger.warning(f"Qdrant vector DB initialization check skipped or failed: {str(e)}")
+        logger.warning(f"Qdrant vector DB initialization check: {str(e)}")
