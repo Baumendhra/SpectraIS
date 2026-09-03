@@ -16,9 +16,7 @@ import {
   ShieldCheck,
   BarChart3,
   SearchCheck,
-  Network,
-  Cpu,
-  Globe
+  Network
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { Badge } from "@/components/ui/Badge";
@@ -29,54 +27,33 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: string[];
-  group?: "workspace" | "intelligence" | "compliance" | "admin";
 }
 
 const navigation: NavItem[] = [
-  // 1. Core Workspace
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, group: "workspace" },
-  { name: "Procurement OS", href: "/dashboard/procurement-os", icon: Globe, group: "workspace" },
-  { name: "AI Command Center", href: "/dashboard/command-center", icon: Cpu, group: "workspace" },
-
-  // 2. Intelligence & Tools
-  { name: "Executive Analytics", href: "/dashboard/analytics", icon: BarChart3, group: "intelligence" },
-  { name: "AI Recommendations", href: "/dashboard/recommendations", icon: SearchCheck, group: "intelligence" },
-  { name: "AI Copilot Chat", href: "/dashboard/copilot", icon: Bot, group: "intelligence" },
-  { name: "Supplier Intelligence", href: "/dashboard/suppliers", icon: Building2, group: "intelligence" },
-
-  // 3. Standards & Compliance
-  { name: "Gov Integrations", href: "/dashboard/integrations", icon: Network, group: "compliance" },
-  { name: "AI Benchmark Eval", href: "/dashboard/evaluation", icon: BookOpenCheck, group: "compliance" },
-  { name: "Knowledge Base & RAG", href: "/dashboard/knowledge", icon: Database, group: "compliance" },
-  { name: "BIS Standards", href: "/dashboard/standards", icon: BookOpenCheck, group: "compliance" },
-  { name: "Tenders & Compliance", href: "/dashboard/tenders", icon: FileCheck2, group: "compliance" },
-
-  // 4. Administration
-  { name: "User Management", href: "/dashboard/users", icon: Users, roles: ["SUPER_ADMIN", "ORG_ADMIN"], group: "admin" },
-  { name: "Organizations", href: "/dashboard/organizations", icon: Building2, roles: ["SUPER_ADMIN"], group: "admin" },
-  { name: "Audit Trail", href: "/dashboard/audit", icon: ShieldAlert, roles: ["SUPER_ADMIN", "AUDITOR"], group: "admin" },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Executive Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "AI Recommendations & RAG", href: "/dashboard/recommendations", icon: SearchCheck },
+  { name: "AI Copilot Chat", href: "/dashboard/copilot", icon: Bot },
+  { name: "Gov Integrations", href: "/dashboard/integrations", icon: Network },
+  { name: "AI Benchmark Eval", href: "/dashboard/evaluation", icon: BookOpenCheck },
+  { name: "BIS Standards", href: "/dashboard/standards", icon: BookOpenCheck },
+  { name: "Tenders & Compliance", href: "/dashboard/tenders", icon: FileCheck2 },
+  { name: "User Management", href: "/dashboard/users", icon: Users, roles: ["SUPER_ADMIN", "ORG_ADMIN"] },
+  { name: "Organizations", href: "/dashboard/organizations", icon: Building2, roles: ["SUPER_ADMIN"] },
+  { name: "Audit Trail", href: "/dashboard/audit", icon: ShieldAlert, roles: ["SUPER_ADMIN", "AUDITOR"] },
 ];
-
-const groupLabels: Record<string, string> = {
-  workspace: "Workspace",
-  intelligence: "Intelligence & Tools",
-  compliance: "Standards & Compliance",
-  admin: "Administration",
-};
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
 
-  // Normalize user roles array safely
   const rawRoles = user?.roles || [];
   const userRoles: string[] = Array.isArray(rawRoles)
     ? rawRoles.map((r: any) => (typeof r === "string" ? r : r?.name || ""))
     : [];
   const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
 
-  // Determine if item should be visible based on RBAC
   const isItemVisible = (item: NavItem) => {
     if (!item.roles || item.roles.length === 0) return true;
     if (isSuperAdmin) return true;
@@ -87,8 +64,6 @@ export const Sidebar: React.FC = () => {
     logout();
     router.push("/login");
   };
-
-  const groups = ["workspace", "intelligence", "compliance", "admin"];
 
   return (
     <aside className="w-64 bg-[#ebe5d8] border-r border-[#c4a484]/40 h-screen sticky top-0 z-30 flex flex-col justify-between select-none shadow-xs shrink-0">
@@ -113,47 +88,36 @@ export const Sidebar: React.FC = () => {
         </Link>
 
         {/* Scrollable Navigation Menu */}
-        <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-3.5" aria-label="Main Navigation">
-          {groups.map((groupKey) => {
-            const itemsInGroup = navigation.filter((item) => item.group === groupKey && isItemVisible(item));
-            if (itemsInGroup.length === 0) return null;
+        <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-1" aria-label="Main Navigation">
+          {navigation.map((item) => {
+            if (!isItemVisible(item)) return null;
+
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const Icon = item.icon;
 
             return (
-              <div key={groupKey} className="space-y-0.5">
-                <div className="text-[9.5px] font-bold text-[#6f4e37]/75 uppercase tracking-wider px-2.5 pt-1 pb-1">
-                  {groupLabels[groupKey]}
-                </div>
-                {itemsInGroup.map((item) => {
-                  // Active route matching (exact for root, prefix for sub-routes)
-                  const isActive =
-                    pathname === item.href ||
-                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                  const Icon = item.icon;
-
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all group relative",
-                        isActive
-                          ? "bg-[#6f4e37] text-[#f8f5f0] font-semibold shadow-xs"
-                          : "text-[#3d2b1f]/85 hover:text-[#3d2b1f] hover:bg-[#dfd5c3]/60"
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "h-4 w-4 shrink-0 flex items-center justify-center transition-colors",
-                          isActive ? "text-[#f8f5f0]" : "text-[#6f4e37] group-hover:text-[#3d2b1f]"
-                        )}
-                      >
-                        <Icon className="h-3.5 w-3.5" />
-                      </span>
-                      <span className="truncate">{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-all group relative",
+                  isActive
+                    ? "bg-[#6f4e37] text-[#f8f5f0] font-semibold shadow-xs"
+                    : "text-[#3d2b1f]/85 hover:text-[#3d2b1f] hover:bg-[#dfd5c3]/60"
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-4 w-4 shrink-0 flex items-center justify-center transition-colors",
+                    isActive ? "text-[#f8f5f0]" : "text-[#6f4e37] group-hover:text-[#3d2b1f]"
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                <span className="truncate">{item.name}</span>
+              </Link>
             );
           })}
         </nav>
