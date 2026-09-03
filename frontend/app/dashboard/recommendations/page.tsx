@@ -47,7 +47,7 @@ export default function RecommendationsWorkspacePage() {
   // Recommendation Input state
   const [inputMode, setInputMode] = useState<"text" | "pdf">("text");
   const [procurementInput, setProcurementInput] = useState(
-    "Need procurement of LED street lights for municipal highway lighting with minimum 10kV surge protection and IP66 ingress rating."
+    "Procurement of 500 High-Performance Commercial Laptop Computers and 100 Desktop PCs for Government Office Deployment with 14-inch Full HD display, minimum 16GB RAM, 512GB NVMe SSD, Type-C Power Adaptor, and mandatory BIS CRS IS 13252 Security Compliance."
   );
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<any>(null);
