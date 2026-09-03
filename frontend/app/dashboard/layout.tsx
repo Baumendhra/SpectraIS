@@ -9,7 +9,7 @@ import { api } from "@/lib/api";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { user, setUser, isAuthenticated } = useAuthStore();
+  const { user, setUser } = useAuthStore();
 
   useEffect(() => {
     // Fetch profile on initial load if token exists
@@ -31,11 +31,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user, setUser, router]);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex text-slate-100">
+    <div className="min-h-screen bg-[#f8f5f0] flex text-[#3d2b1f]">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
-        <main className="p-6 flex-1 overflow-y-auto">
+        <main className="p-4 sm:p-6 flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

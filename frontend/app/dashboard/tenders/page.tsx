@@ -23,7 +23,7 @@ export default function TendersDashboardPage() {
       grade: "B",
       gaps: 3,
       status: "COMPLETED",
-      date: "2026-09-01"
+      date: "2026-09-01",
     },
     {
       id: "TND-77B31C",
@@ -36,7 +36,7 @@ export default function TendersDashboardPage() {
       grade: "A+",
       gaps: 1,
       status: "COMPLETED",
-      date: "2026-08-28"
+      date: "2026-08-28",
     },
     {
       id: "TND-55C19E",
@@ -49,26 +49,28 @@ export default function TendersDashboardPage() {
       grade: "A",
       gaps: 2,
       status: "COMPLETED",
-      date: "2026-08-25"
-    }
+      date: "2026-08-25",
+    },
   ]);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 max-w-7xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 shadow-card">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <FileCheck2 className="h-6 w-6 text-blue-400" />
-            Tender Analysis & Compliance Intelligence Platform
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">
+          <div className="flex items-center gap-2">
+            <FileCheck2 className="h-5 w-5 text-[#6f4e37]" />
+            <h1 className="text-lg sm:text-xl font-bold text-[#3d2b1f] tracking-tight">
+              Tender Analysis & Compliance Intelligence Platform
+            </h1>
+          </div>
+          <p className="text-xs text-[#6f4e37]/80 mt-0.5">
             Automated Tender Document Extraction, BIS Gap Analysis, Compliance Scoring, and Risk Intelligence.
           </p>
         </div>
 
         <Link href="/dashboard/tenders/upload">
-          <Button className="bg-blue-600 hover:bg-blue-500 text-white gap-2">
+          <Button className="gap-1.5 self-start sm:self-auto">
             <UploadCloud className="h-4 w-4" /> Upload & Analyze Tender
           </Button>
         </Link>
@@ -76,77 +78,77 @@ export default function TendersDashboardPage() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#6f4e37]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Total Analyzed Tenders</span>
-            <p className="text-2xl font-black text-white mt-1">{tenders.length}</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Total Analyzed Tenders</span>
+            <p className="text-2xl font-bold text-[#3d2b1f] mt-1">{tenders.length}</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#295030]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Avg Compliance Score</span>
-            <p className="text-2xl font-black text-emerald-400 mt-1">82.7%</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Avg Compliance Score</span>
+            <p className="text-2xl font-bold text-[#295030] mt-1 font-mono">82.7%</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#7d5017]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Detected Compliance Gaps</span>
-            <p className="text-2xl font-black text-amber-400 mt-1">6 Active Gaps</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Detected Compliance Gaps</span>
+            <p className="text-2xl font-bold text-[#7d5017] mt-1 font-mono">6 Active Gaps</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#3d2b1f]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Government Auditability</span>
-            <p className="text-2xl font-black text-blue-400 mt-1">100% Traceable</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Government Auditability</span>
+            <p className="text-2xl font-bold text-[#3d2b1f] mt-1">100% Traceable</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Tender List */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-white">Analyzed Procurement Tenders</h3>
+        <h3 className="text-sm font-bold text-[#3d2b1f]">Analyzed Procurement Tenders</h3>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800 glass-panel">
+        <div className="overflow-x-auto rounded-lg border border-[#c4a484]/40 bg-white shadow-card">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-900/90 text-[11px] font-bold uppercase text-slate-400 border-b border-slate-800">
-                <th className="p-3.5">Reference / Title</th>
-                <th className="p-3.5">Department</th>
-                <th className="p-3.5">Domain</th>
-                <th className="p-3.5 text-center">Score / Grade</th>
-                <th className="p-3.5 text-center">Gaps</th>
-                <th className="p-3.5 text-right">Action</th>
+              <tr className="bg-[#ebe5d8] text-[10px] font-bold uppercase text-[#6f4e37] border-b border-[#c4a484]/40">
+                <th className="p-3">Reference / Title</th>
+                <th className="p-3">Department</th>
+                <th className="p-3">Domain</th>
+                <th className="p-3 text-center">Score / Grade</th>
+                <th className="p-3 text-center">Gaps</th>
+                <th className="p-3 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-xs">
+            <tbody className="divide-y divide-[#c4a484]/20 text-xs">
               {tenders.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-900/40 transition-colors">
-                  <td className="p-3.5">
-                    <p className="font-bold text-white">{t.title}</p>
-                    <span className="font-mono text-[11px] text-blue-400">{t.ref}</span>
+                <tr key={t.id} className="hover:bg-[#ebe5d8]/40 transition-colors">
+                  <td className="p-3">
+                    <p className="font-semibold text-[#3d2b1f]">{t.title}</p>
+                    <span className="font-mono text-[11px] text-[#6f4e37]">{t.ref}</span>
                   </td>
-                  <td className="p-3.5 text-slate-300">{t.department}</td>
-                  <td className="p-3.5">
-                    <Badge variant="outline" className="text-[10px] border-slate-700">
+                  <td className="p-3 text-[#3d2b1f]/80">{t.department}</td>
+                  <td className="p-3">
+                    <Badge variant="neutral" className="text-[10px]">
                       {t.domain}
                     </Badge>
                   </td>
-                  <td className="p-3.5 text-center">
-                    <span className="font-bold text-emerald-400">{t.score}%</span>{" "}
+                  <td className="p-3 text-center">
+                    <span className="font-bold text-[#295030] font-mono">{t.score}%</span>{" "}
                     <Badge variant="success" className="text-[10px] ml-1">
                       {t.grade}
                     </Badge>
                   </td>
-                  <td className="p-3.5 text-center font-bold text-amber-400">{t.gaps} Gaps</td>
-                  <td className="p-3.5 text-right">
+                  <td className="p-3 text-center font-bold text-[#7d5017] font-mono">{t.gaps} Gaps</td>
+                  <td className="p-3 text-right">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => router.push(`/dashboard/tenders/${t.id}`)}
-                      className="text-xs gap-1 h-8 border-slate-700 hover:text-blue-400"
+                      className="text-xs gap-1 h-7 border-[#c4a484] hover:bg-[#ebe5d8] text-[#3d2b1f]"
                     >
                       <Eye className="h-3.5 w-3.5" /> View Analysis
                     </Button>

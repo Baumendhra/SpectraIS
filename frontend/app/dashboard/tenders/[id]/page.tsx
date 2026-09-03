@@ -35,7 +35,7 @@ export default function TenderAnalysisDetailPage() {
     if (cached) {
       setAnalysis(JSON.parse(cached));
     } else {
-      // Fallback mock analysis data for direct navigation
+      // Fallback analysis data for direct navigation
       api.post("/tenders-v2/analyze-text", {
         filename: "LED_Street_Light_Tender.pdf",
         tender_text: "Procurement of LED street lights for municipal highway lighting with 10kV surge protection referencing IS 10322:1982.",
@@ -68,31 +68,42 @@ export default function TenderAnalysisDetailPage() {
 
   if (!analysis) {
     return (
-      <div className="p-12 text-center text-slate-400">
+      <div className="p-12 text-center text-[#6f4e37]/70">
         <p>Loading Tender Compliance Analysis...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 max-w-7xl mx-auto pb-12">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 shadow-card">
         <div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard/tenders")} className="text-slate-400 p-0 h-auto">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/dashboard/tenders")}
+              className="text-[#6f4e37] hover:text-[#3d2b1f] p-0 h-auto"
+            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-xl font-bold text-white tracking-tight">{analysis.title}</h1>
+            <h1 className="text-base sm:text-xl font-bold text-[#3d2b1f] tracking-tight">{analysis.title}</h1>
           </div>
-          <p className="text-slate-400 text-xs mt-1">
-            Ref: <span className="font-mono text-blue-400">{analysis.reference_number}</span> • Department: {analysis.department}
+          <p className="text-[#6f4e37]/80 text-xs mt-1">
+            Ref: <span className="font-mono text-[#6f4e37] font-semibold">{analysis.reference_number}</span> • Department: {analysis.department}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={handleDownloadHtmlReport} disabled={isGeneratingReport} className="gap-2 border-slate-700">
-            <Printer className="h-4 w-4 text-blue-400" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadHtmlReport}
+            disabled={isGeneratingReport}
+            className="gap-2 border-[#c4a484] hover:bg-[#dfd5c3] text-[#3d2b1f]"
+          >
+            <Printer className="h-4 w-4 text-[#6f4e37]" />
             Export Compliance Report
           </Button>
         </div>
@@ -100,32 +111,28 @@ export default function TenderAnalysisDetailPage() {
 
       {/* Compliance Score Gauge */}
       <ComplianceGauge
-        score={analysis.overall_score.overall_score}
-        grade={analysis.overall_score.grade}
-        explainability={analysis.overall_score.explainability}
+        score={analysis.overall_score?.overall_score || 0}
+        grade={analysis.overall_score?.grade || "N/A"}
+        explainability={analysis.overall_score?.explainability || ""}
       />
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="glass-panel border-slate-800">
-          <CardContent className="p-4">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase">Product Category</span>
-            <p className="text-sm font-bold text-white mt-1">{analysis.understanding.product_category}</p>
-          </CardContent>
+        <Card className="p-4">
+          <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Product Category</span>
+          <p className="text-xs sm:text-sm font-bold text-[#3d2b1f] mt-1">{analysis.understanding?.product_category}</p>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
-          <CardContent className="p-4">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase">Domain Classification</span>
-            <p className="text-sm font-bold text-blue-400 mt-1">{analysis.understanding.domain}</p>
-          </CardContent>
+        <Card className="p-4">
+          <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Domain Classification</span>
+          <p className="text-xs sm:text-sm font-bold text-[#6f4e37] mt-1">{analysis.understanding?.domain}</p>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
-          <CardContent className="p-4">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase">Total Compliance Gaps</span>
-            <p className="text-sm font-bold text-rose-400 mt-1">{analysis.gaps.length} Gaps Identified</p>
-          </CardContent>
+        <Card className="p-4">
+          <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Total Compliance Gaps</span>
+          <p className="text-xs sm:text-sm font-bold text-[#822424] mt-1 font-mono">
+            {analysis.gaps?.length || 0} Gaps Identified
+          </p>
         </Card>
       </div>
 
@@ -133,10 +140,10 @@ export default function TenderAnalysisDetailPage() {
       <RiskMatrix risks={analysis.risks} />
 
       {/* Side-by-Side Comparison Matrix */}
-      <SideBySideComparison matrix={analysis.comparison.comparison_matrix} />
+      <SideBySideComparison matrix={analysis.comparison?.comparison_matrix || []} />
 
       {/* Ready-to-Use Procurement Clauses */}
-      <ClauseViewer clauses={analysis.recommended_clauses} />
+      <ClauseViewer clauses={analysis.recommended_clauses || []} />
     </div>
   );
 }

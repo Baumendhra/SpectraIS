@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Cpu, ShieldCheck, Activity, Award, Network, Zap, CheckCircle2, TrendingUp, AlertTriangle } from "lucide-react";
+import { Cpu, ShieldCheck, Activity, Award, Zap, CheckCircle2, TrendingUp, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -35,100 +35,110 @@ export default function ProcurementCommandCenterPage() {
 
   if (!overview) {
     return (
-      <div className="p-12 text-center text-slate-400">
+      <div className="p-12 text-center text-[#6f4e37]/70">
         <p>Loading Procurement Command Center...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-5 max-w-7xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-lg bg-[#ebe5d8] border border-[#c4a484]/50 shadow-card">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Cpu className="h-6 w-6 text-blue-400" />
-            National AI Procurement Command Center
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">
+          <div className="flex items-center gap-2">
+            <Cpu className="h-5 w-5 text-[#6f4e37]" />
+            <h1 className="text-lg sm:text-xl font-bold text-[#3d2b1f] tracking-tight">
+              National AI Procurement Command Center
+            </h1>
+          </div>
+          <p className="text-xs text-[#6f4e37]/80 mt-0.5">
             Unified Multi-Agent Decision-Support Ecosystem, Autonomous Tender Review, and Predictive Compliance Intelligence.
           </p>
         </div>
-        <Button onClick={handleRunAutonomousReview} disabled={isRunningReview} className="bg-blue-600 hover:bg-blue-500 text-white gap-2">
+        <Button
+          onClick={handleRunAutonomousReview}
+          disabled={isRunningReview}
+          className="gap-2 self-start md:self-auto"
+        >
           {isRunningReview ? <Activity className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
           Trigger 9-Agent Autonomous Review
         </Button>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="glass-panel border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <Card className="border-l-4 border-l-[#295030]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">National Avg PQI</span>
-            <p className="text-3xl font-black text-emerald-400 mt-1">{overview.national_avg_pqi}/100</p>
-            <p className="text-[11px] text-slate-400 mt-1">Grade A Procurement Quality</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">National Avg PQI</span>
+            <p className="text-2xl sm:text-3xl font-bold text-[#295030] mt-1 font-mono">{overview.national_avg_pqi}/100</p>
+            <p className="text-[11px] text-[#295030] mt-0.5 font-medium">Grade A Procurement Quality</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#6f4e37]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Active Multi-Agent Tasks</span>
-            <p className="text-3xl font-black text-blue-400 mt-1">{overview.active_multi_agent_tasks}</p>
-            <p className="text-[11px] text-blue-400 mt-1">9 Agents Operating</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Active Multi-Agent Tasks</span>
+            <p className="text-2xl sm:text-3xl font-bold text-[#6f4e37] mt-1 font-mono">{overview.active_multi_agent_tasks}</p>
+            <p className="text-[11px] text-[#6f4e37]/80 mt-0.5 font-medium">9 Agents Operating</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#c4a484]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">AIOps Precision</span>
-            <p className="text-3xl font-black text-indigo-400 mt-1">{Math.round(overview.aiops_precision * 100)}%</p>
-            <p className="text-[11px] text-emerald-400 mt-1 font-semibold">Zero Hallucination Rate</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">AIOps Precision</span>
+            <p className="text-2xl sm:text-3xl font-bold text-[#3d2b1f] mt-1 font-mono">{Math.round(overview.aiops_precision * 100)}%</p>
+            <p className="text-[11px] text-[#295030] mt-0.5 font-semibold">Zero Hallucination Rate</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-slate-800">
+        <Card className="border-l-4 border-l-[#822424]">
           <CardContent className="p-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase">Flagged Risk Tenders</span>
-            <p className="text-3xl font-black text-rose-400 mt-1">{overview.high_risk_tenders_flagged}</p>
-            <p className="text-[11px] text-slate-400 mt-1">Action Required</p>
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase">Flagged Risk Tenders</span>
+            <p className="text-2xl sm:text-3xl font-bold text-[#822424] mt-1 font-mono">{overview.high_risk_tenders_flagged}</p>
+            <p className="text-[11px] text-[#822424] mt-0.5 font-medium">Action Required</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Autonomous Multi-Agent Execution Results */}
       {autonomousPackage && (
-        <Card className="glass-panel border-slate-800">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-5 w-5 text-blue-400" />
+        <Card>
+          <CardHeader className="border-b border-[#c4a484]/30 pb-3">
+            <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+              <Zap className="h-4.5 w-4.5 text-[#6f4e37]" />
               9-Agent Multi-Agent Autonomous Review Execution
             </CardTitle>
             <CardDescription className="text-xs">
               Autonomous review package generated for '{autonomousPackage.tender_title}'
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+          <CardContent className="space-y-4 pt-4">
+            <div className="p-3.5 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-400 uppercase">Review ID: {autonomousPackage.review_id}</span>
-                <p className="text-sm font-bold text-white mt-0.5">{autonomousPackage.review_summary}</p>
+                <span className="text-[10px] font-bold text-[#6f4e37] uppercase font-mono">
+                  Review ID: {autonomousPackage.review_id}
+                </span>
+                <p className="text-xs sm:text-sm font-semibold text-[#3d2b1f] mt-0.5">
+                  {autonomousPackage.review_summary}
+                </p>
               </div>
-              <Badge variant="success" className="px-3 py-1 text-xs">
+              <Badge variant="success" className="px-2.5 py-1 text-xs font-mono">
                 PQI {autonomousPackage.overall_pqi_score}/100
               </Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {autonomousPackage.agent_logs.map((agent: any, idx: number) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+                <div key={idx} className="p-3 rounded-md bg-[#ebe5d8] border border-[#c4a484]/40 space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-blue-400">{agent.agent_name}</span>
-                    <Badge variant="success" className="text-[9px]">
+                    <span className="font-semibold text-xs text-[#6f4e37]">{agent.agent_name}</span>
+                    <Badge variant="success" className="text-[9px] py-0">
                       {agent.status}
                     </Badge>
                   </div>
-                  <p className="text-[11px] text-slate-300 leading-normal">{agent.output_summary}</p>
-                  <span className="text-[10px] text-slate-500 font-mono">{agent.execution_time_ms}ms</span>
+                  <p className="text-[11px] text-[#3d2b1f]/85 leading-normal">{agent.output_summary}</p>
+                  <span className="text-[10px] text-[#6f4e37]/75 font-mono block pt-0.5">{agent.execution_time_ms}ms</span>
                 </div>
               ))}
             </div>
@@ -137,35 +147,38 @@ export default function ProcurementCommandCenterPage() {
       )}
 
       {/* AI Procurement Roadmap Overview */}
-      <Card className="glass-panel border-slate-800">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Award className="h-5 w-5 text-emerald-400" />
+      <Card>
+        <CardHeader className="border-b border-[#c4a484]/30 pb-3">
+          <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+            <Award className="h-4.5 w-4.5 text-[#6f4e37]" />
             National AI Procurement Strategic Roadmap (1-Year / 3-Year / 5-Year)
           </CardTitle>
+          <CardDescription className="text-xs">
+            Multi-phase roadmap for national government compliance automation and procurement transformation.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+            <div className="p-4 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 space-y-1.5">
               <Badge variant="info" className="text-[10px]">YEAR 1 (CURRENT)</Badge>
-              <h4 className="font-bold text-white text-sm">Multi-Agent Intelligence & GeM Sync</h4>
-              <p className="text-slate-400 leading-relaxed">
+              <h4 className="font-bold text-[#3d2b1f] text-xs sm:text-sm">Multi-Agent Intelligence & GeM Sync</h4>
+              <p className="text-[#3d2b1f]/80 leading-relaxed text-[11px]">
                 Autonomous 9-agent tender review, PQI scoring, BIS Gazette amendment tracking, and GeM/CPPP portal integration adapters.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div className="p-4 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 space-y-1.5">
               <Badge variant="warning" className="text-[10px]">YEAR 3 (MEDIUM-TERM)</Badge>
-              <h4 className="font-bold text-white text-sm">Predictive Vendor Risk & ISO Mapping</h4>
-              <p className="text-slate-400 leading-relaxed">
+              <h4 className="font-bold text-[#3d2b1f] text-xs sm:text-sm">Predictive Vendor Risk & ISO Mapping</h4>
+              <p className="text-[#3d2b1f]/80 leading-relaxed text-[11px]">
                 ML-driven supplier risk forecasting, ISO-to-BIS cross-reference mapping, mobile applications, and API Marketplace.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div className="p-4 rounded-md bg-[#f8f5f0] border border-[#c4a484]/40 space-y-1.5">
               <Badge variant="success" className="text-[10px]">YEAR 5 (VISION)</Badge>
-              <h4 className="font-bold text-white text-sm">National Autonomous Procurement Network</h4>
-              <p className="text-slate-400 leading-relaxed">
+              <h4 className="font-bold text-[#3d2b1f] text-xs sm:text-sm">National Autonomous Procurement Network</h4>
+              <p className="text-[#3d2b1f]/80 leading-relaxed text-[11px]">
                 Nationwide autonomous compliance monitoring, predictive public budget allocation, and self-healing tender specifications.
               </p>
             </div>

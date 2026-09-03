@@ -64,32 +64,40 @@ export default function TenderUploadPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+    <div className="space-y-5 max-w-4xl mx-auto pb-12">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-1.5 text-slate-400">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.back()}
+          className="gap-1.5 text-[#6f4e37] hover:text-[#3d2b1f]"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Tenders
         </Button>
       </div>
 
-      <Card className="glass-panel border-slate-800">
-        <CardHeader>
-          <CardTitle className="text-xl flex items-center gap-2.5">
-            <UploadCloud className="h-6 w-6 text-blue-400" />
+      <Card>
+        <CardHeader className="border-b border-[#c4a484]/30 pb-3">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+            <UploadCloud className="h-5 w-5 text-[#6f4e37]" />
             Tender Document Upload & Compliance Intelligence Pipeline
           </CardTitle>
           <CardDescription className="text-xs">
             Upload procurement tenders (PDF, DOCX, TXT) for instant 0–100 compliance scoring, BIS gap analysis, risk assessment, and report generation.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-5 pt-4">
           {/* Drag and Drop Zone */}
           <div
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer ${
-              dragActive ? "border-blue-500 bg-blue-950/20" : "border-slate-800 bg-slate-900/40 hover:border-slate-700"
+            onClick={() => document.getElementById("file-upload")?.click()}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer ${
+              dragActive
+                ? "border-[#6f4e37] bg-[#ebe5d8]"
+                : "border-[#c4a484]/60 bg-[#f8f5f0] hover:border-[#6f4e37]"
             }`}
           >
             <input
@@ -99,58 +107,56 @@ export default function TenderUploadPage() {
               onChange={handleFileChange}
               className="hidden"
             />
-            <label htmlFor="file-upload" className="cursor-pointer space-y-3 block">
-              <UploadCloud className="h-12 w-12 text-blue-400 mx-auto animate-bounce" />
-              <div>
-                <p className="text-sm font-bold text-white">Drag & drop your tender document here</p>
-                <p className="text-xs text-slate-400 mt-1">Supports PDF, Word (.docx), or plain text (.txt) up to 50MB</p>
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <div className="p-3 rounded-md bg-[#ebe5d8] text-[#6f4e37]">
+                <FileText className="h-7 w-7" />
               </div>
-              <Badge variant="outline" className="text-xs border-slate-700">
-                Browse Files
-              </Badge>
-            </label>
+              <div>
+                <p className="text-xs sm:text-sm font-semibold text-[#3d2b1f]">
+                  {selectedFile ? selectedFile.name : "Click to select or drag and drop tender document"}
+                </p>
+                <p className="text-[11px] text-[#6f4e37]/80 mt-0.5">
+                  {selectedFile
+                    ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to analyze`
+                    : "Supports technical specifications, RFPs, and BOQs up to 25MB"}
+                </p>
+              </div>
+              {!selectedFile && (
+                <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#ebe5d8] text-[#3d2b1f] border border-[#c4a484]/50 pointer-events-none mt-2">
+                  Browse Files
+                </span>
+              )}
+            </div>
           </div>
 
-          {/* Selected File Details */}
-          {selectedFile && (
-            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <FileText className="h-6 w-6 text-blue-400" />
-                <div>
-                  <p className="text-sm font-bold text-white">{selectedFile.name}</p>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type || "Document"}
-                  </p>
-                </div>
-              </div>
-              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-            </div>
-          )}
-
           {error && (
-            <div className="p-4 rounded-xl bg-rose-950/30 border border-rose-800/40 text-xs text-rose-300 flex items-center gap-2">
+            <div className="p-3 rounded-md bg-[#f9ecec] border border-[#822424]/30 text-xs text-[#822424] flex items-center gap-2">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              {error}
+              <span>{error}</span>
             </div>
           )}
 
-          <div className="flex justify-end">
+          {/* Action buttons */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedFile(null);
+                setError(null);
+              }}
+              disabled={!selectedFile || isUploading}
+              className="border-[#c4a484] text-[#3d2b1f]"
+            >
+              Clear
+            </Button>
             <Button
               onClick={handleUploadAndAnalyze}
               disabled={!selectedFile || isUploading}
-              className="bg-blue-600 hover:bg-blue-500 text-white gap-2"
+              isLoading={isUploading}
+              className="gap-2"
             >
-              {isUploading ? (
-                <>
-                  <Activity className="h-4 w-4 animate-spin" />
-                  Running Document Intelligence & Gap Analysis...
-                </>
-              ) : (
-                <>
-                  <UploadCloud className="h-4 w-4" />
-                  Start Compliance Intelligence Analysis
-                </>
-              )}
+              <CheckCircle2 className="h-4 w-4" />
+              Upload & Run Full Compliance Audit
             </Button>
           </div>
         </CardContent>

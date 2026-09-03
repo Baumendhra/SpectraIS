@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Bot,
@@ -13,94 +13,183 @@ import {
   Building2,
   ShieldAlert,
   LogOut,
-  Sparkles
+  ShieldCheck,
+  BarChart3,
+  SearchCheck,
+  Network,
+  Cpu,
+  Globe
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Procurement OS", href: "/dashboard/procurement-os", icon: LayoutDashboard },
-  { name: "AI Command Center", href: "/dashboard/command-center", icon: Sparkles },
-  { name: "Executive Analytics", href: "/dashboard/analytics", icon: Sparkles },
-  { name: "AI Recommendations", href: "/dashboard/recommendations", icon: Sparkles },
-  { name: "AI Copilot Chat", href: "/dashboard/copilot", icon: Bot },
-  { name: "Supplier Intelligence", href: "/dashboard/suppliers", icon: Building2 },
-  { name: "Gov Integrations", href: "/dashboard/integrations", icon: Building2 },
-  { name: "AI Benchmark Eval", href: "/dashboard/evaluation", icon: BookOpenCheck },
-  { name: "Knowledge Base & RAG", href: "/dashboard/knowledge", icon: Database },
-  { name: "BIS Standards", href: "/dashboard/standards", icon: BookOpenCheck },
-  { name: "Tenders & Compliance", href: "/dashboard/tenders", icon: FileCheck2 },
-  { name: "User Management", href: "/dashboard/users", icon: Users, roles: ["SUPER_ADMIN", "ORG_ADMIN"] },
-  { name: "Organizations", href: "/dashboard/organizations", icon: Building2, roles: ["SUPER_ADMIN"] },
-  { name: "Audit Trail", href: "/dashboard/audit", icon: ShieldAlert, roles: ["SUPER_ADMIN", "AUDITOR"] },
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+  group?: "workspace" | "intelligence" | "compliance" | "admin";
+}
+
+const navigation: NavItem[] = [
+  // 1. Core Workspace
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, group: "workspace" },
+  { name: "Procurement OS", href: "/dashboard/procurement-os", icon: Globe, group: "workspace" },
+  { name: "AI Command Center", href: "/dashboard/command-center", icon: Cpu, group: "workspace" },
+
+  // 2. Intelligence & Tools
+  { name: "Executive Analytics", href: "/dashboard/analytics", icon: BarChart3, group: "intelligence" },
+  { name: "AI Recommendations", href: "/dashboard/recommendations", icon: SearchCheck, group: "intelligence" },
+  { name: "AI Copilot Chat", href: "/dashboard/copilot", icon: Bot, group: "intelligence" },
+  { name: "Supplier Intelligence", href: "/dashboard/suppliers", icon: Building2, group: "intelligence" },
+
+  // 3. Standards & Compliance
+  { name: "Gov Integrations", href: "/dashboard/integrations", icon: Network, group: "compliance" },
+  { name: "AI Benchmark Eval", href: "/dashboard/evaluation", icon: BookOpenCheck, group: "compliance" },
+  { name: "Knowledge Base & RAG", href: "/dashboard/knowledge", icon: Database, group: "compliance" },
+  { name: "BIS Standards", href: "/dashboard/standards", icon: BookOpenCheck, group: "compliance" },
+  { name: "Tenders & Compliance", href: "/dashboard/tenders", icon: FileCheck2, group: "compliance" },
+
+  // 4. Administration
+  { name: "User Management", href: "/dashboard/users", icon: Users, roles: ["SUPER_ADMIN", "ORG_ADMIN"], group: "admin" },
+  { name: "Organizations", href: "/dashboard/organizations", icon: Building2, roles: ["SUPER_ADMIN"], group: "admin" },
+  { name: "Audit Trail", href: "/dashboard/audit", icon: ShieldAlert, roles: ["SUPER_ADMIN", "AUDITOR"], group: "admin" },
 ];
+
+const groupLabels: Record<string, string> = {
+  workspace: "Workspace",
+  intelligence: "Intelligence & Tools",
+  compliance: "Standards & Compliance",
+  admin: "Administration",
+};
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuthStore();
-  const userRoles = user?.roles || [];
+
+  // Normalize user roles array safely
+  const rawRoles = user?.roles || [];
+  const userRoles: string[] = Array.isArray(rawRoles)
+    ? rawRoles.map((r: any) => (typeof r === "string" ? r : r?.name || ""))
+    : [];
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+
+  // Determine if item should be visible based on RBAC
+  const isItemVisible = (item: NavItem) => {
+    if (!item.roles || item.roles.length === 0) return true;
+    if (isSuperAdmin) return true;
+    return item.roles.some((r) => userRoles.includes(r));
+  };
+
+  const handleSignOut = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const groups = ["workspace", "intelligence", "compliance", "admin"];
 
   return (
-    <aside className="w-64 glass-panel flex flex-col justify-between border-r border-slate-800/80 h-screen sticky top-0 z-30">
-      <div>
+    <aside className="w-64 bg-[#ebe5d8] border-r border-[#c4a484]/40 h-screen sticky top-0 z-30 flex flex-col justify-between select-none shadow-xs shrink-0">
+      {/* Top Section: Brand & Navigation */}
+      <div className="flex flex-col flex-1 min-h-0">
         {/* Brand Header */}
-        <div className="p-5 flex items-center gap-3 border-b border-slate-800/60">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Sparkles className="h-5 w-5 text-white animate-pulse" />
+        <Link
+          href="/dashboard"
+          className="h-14 px-4 flex items-center gap-3 border-b border-[#c4a484]/40 bg-[#ebe5d8] hover:bg-[#dfd5c3]/40 transition-colors"
+        >
+          <div className="h-8 w-8 rounded-md bg-[#6f4e37] flex items-center justify-center text-[#f8f5f0] shadow-xs shrink-0">
+            <ShieldCheck className="h-4.5 w-4.5" />
           </div>
-          <div>
-            <h1 className="font-bold text-base text-white tracking-tight flex items-center gap-1.5">
-              Spectra<span className="text-blue-400">IS</span>
+          <div className="min-w-0">
+            <h1 className="font-bold text-sm text-[#3d2b1f] tracking-tight flex items-center gap-1 leading-none">
+              Spectra<span className="text-[#6f4e37]">IS</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-medium">Compliance Copilot v2.0</p>
+            <p className="text-[10px] text-[#6f4e37]/80 font-medium tracking-normal truncate mt-0.5">
+              Standards Intelligence Platform
+            </p>
           </div>
-        </div>
+        </Link>
 
-        {/* Navigation Menu */}
-        <nav className="p-3 space-y-1.5 mt-2">
-          {navigation.map((item) => {
-            if (item.roles && !item.roles.some((r) => userRoles.includes(r as any) || userRoles.includes("SUPER_ADMIN"))) {
-              return null;
-            }
-            const isActive = pathname === item.href;
-            const Icon = item.icon;
+        {/* Scrollable Navigation Menu */}
+        <nav className="flex-1 overflow-y-auto px-2.5 py-3 space-y-3.5" aria-label="Main Navigation">
+          {groups.map((groupKey) => {
+            const itemsInGroup = navigation.filter((item) => item.group === groupKey && isItemVisible(item));
+            if (itemsInGroup.length === 0) return null;
+
             return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-                  isActive
-                    ? "bg-blue-600/15 text-blue-400 border border-blue-500/30 font-semibold"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
-                )}
-              >
-                <Icon className={cn("h-4 w-4 transition-transform group-hover:scale-110", isActive ? "text-blue-400" : "text-slate-400")} />
-                {item.name}
-              </Link>
+              <div key={groupKey} className="space-y-0.5">
+                <div className="text-[9.5px] font-bold text-[#6f4e37]/75 uppercase tracking-wider px-2.5 pt-1 pb-1">
+                  {groupLabels[groupKey]}
+                </div>
+                {itemsInGroup.map((item) => {
+                  // Active route matching (exact for root, prefix for sub-routes)
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all group relative",
+                        isActive
+                          ? "bg-[#6f4e37] text-[#f8f5f0] font-semibold shadow-xs"
+                          : "text-[#3d2b1f]/85 hover:text-[#3d2b1f] hover:bg-[#dfd5c3]/60"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "h-4 w-4 shrink-0 flex items-center justify-center transition-colors",
+                          isActive ? "text-[#f8f5f0]" : "text-[#6f4e37] group-hover:text-[#3d2b1f]"
+                        )}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </div>
             );
           })}
         </nav>
       </div>
 
       {/* User Footer / Role Card */}
-      <div className="p-4 border-t border-slate-800/60 space-y-3">
-        {user && (
-          <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-200 truncate">{user.full_name}</span>
-              <Badge variant="info" className="text-[10px] py-0 px-1.5 uppercase">
-                {user.roles[0] || "USER"}
-              </Badge>
+      <div className="p-3 border-t border-[#c4a484]/40 bg-[#ebe5d8] space-y-2 shrink-0">
+        {user ? (
+          <div className="p-2.5 rounded-md bg-[#f8f5f0] border border-[#c4a484]/50 shadow-xs flex items-center gap-2.5">
+            <div className="h-7 w-7 rounded-md bg-[#6f4e37] text-[#f8f5f0] flex items-center justify-center font-bold text-xs shrink-0">
+              {user.full_name ? user.full_name.charAt(0).toUpperCase() : "U"}
             </div>
-            <span className="text-[11px] text-slate-400 truncate">{user.email}</span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-semibold text-[#3d2b1f] truncate leading-tight">
+                  {user.full_name}
+                </span>
+                <span className="text-[9px] font-bold uppercase px-1 py-0.2 rounded bg-[#ebe5d8] text-[#6f4e37] border border-[#c4a484]/50 shrink-0">
+                  {userRoles[0] || "OFFICER"}
+                </span>
+              </div>
+              <span className="text-[10px] text-[#6f4e37]/75 truncate block leading-tight font-mono">
+                {user.email}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="p-2 rounded-md bg-[#f8f5f0] border border-[#c4a484]/50 text-center">
+            <span className="text-[11px] text-[#6f4e37] font-medium">Session Active</span>
           </div>
         )}
+
         <button
-          onClick={logout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+          type="button"
+          onClick={handleSignOut}
+          className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-[#6f4e37] hover:text-[#822424] hover:bg-[#f9ecec] rounded-md transition-colors border border-transparent hover:border-[#822424]/20"
         >
           <LogOut className="h-3.5 w-3.5" />
           Sign Out
