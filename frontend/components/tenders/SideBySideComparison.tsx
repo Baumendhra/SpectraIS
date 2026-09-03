@@ -32,28 +32,28 @@ export const SideBySideComparison: React.FC<SideBySideComparisonProps> = ({ matr
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-bold text-white flex items-center gap-2">
-        <ArrowRightLeft className="h-4 w-4 text-blue-400" />
+      <h3 className="text-xs sm:text-sm font-bold text-[#3d2b1f] flex items-center gap-2">
+        <ArrowRightLeft className="h-4 w-4 text-[#6f4e37]" />
         Side-by-Side Tender Spec vs Ideal BIS Compliance Profile
       </h3>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-800 glass-panel">
+      <div className="overflow-x-auto rounded-lg border border-[#c4a484]/40 bg-white shadow-card">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-900/90 text-[11px] font-bold uppercase text-slate-400 border-b border-slate-800">
-              <th className="p-3.5">Parameter / Domain</th>
-              <th className="p-3.5">Current Tender Specification</th>
-              <th className="p-3.5">Ideal BIS Standard Profile</th>
-              <th className="p-3.5 text-center">Status</th>
+            <tr className="bg-[#ebe5d8] text-[10px] font-bold uppercase text-[#6f4e37] border-b border-[#c4a484]/30">
+              <th className="p-3">Parameter / Domain</th>
+              <th className="p-3">Current Tender Specification</th>
+              <th className="p-3">Ideal BIS Standard Profile</th>
+              <th className="p-3 text-center">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-xs">
+          <tbody className="divide-y divide-[#c4a484]/20 text-xs">
             {matrix.map((row, idx) => (
-              <tr key={idx} className="hover:bg-slate-900/40 transition-colors">
-                <td className="p-3.5 font-bold text-slate-200">{row.parameter}</td>
-                <td className="p-3.5 text-slate-300 max-w-xs">{row.tender_specification}</td>
-                <td className="p-3.5 text-blue-300 font-medium max-w-xs">{row.ideal_bis_standard}</td>
-                <td className="p-3.5 text-center">{renderStatusBadge(row.compliance_status)}</td>
+              <tr key={idx} className="hover:bg-[#ebe5d8]/40 transition-colors">
+                <td className="p-3 font-semibold text-[#3d2b1f]">{row.parameter}</td>
+                <td className="p-3 text-[#3d2b1f]/85 max-w-xs">{row.tender_specification}</td>
+                <td className="p-3 text-[#6f4e37] font-medium max-w-xs font-mono">{row.ideal_bis_standard}</td>
+                <td className="p-3 text-center">{renderStatusBadge(row.compliance_status)}</td>
               </tr>
             ))}
           </tbody>

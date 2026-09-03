@@ -7,19 +7,19 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export const Badge: React.FC<BadgeProps> = ({ children, className, variant = "neutral", ...props }) => {
   const variants = {
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    danger: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    neutral: "bg-slate-800 text-slate-300 border-slate-700",
-    outline: "bg-transparent text-slate-300 border-slate-700",
-    secondary: "bg-slate-800/80 text-slate-400 border-slate-700",
+    success: "bg-[#eef3ee] text-[#295030] border-[#295030]/25 font-semibold",
+    warning: "bg-[#faf3e8] text-[#7d5017] border-[#7d5017]/25 font-semibold",
+    danger: "bg-[#f9ecec] text-[#822424] border-[#822424]/25 font-semibold",
+    info: "bg-[#ebe5d8] text-[#6f4e37] border-[#c4a484]/50 font-semibold",
+    neutral: "bg-[#ebe5d8] text-[#3d2b1f] border-[#c4a484]/40",
+    outline: "bg-transparent text-[#3d2b1f] border-[#c4a484]",
+    secondary: "bg-[#f8f5f0] text-[#6f4e37] border-[#c4a484]/50",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-colors",
+        "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border transition-colors",
         variants[variant],
         className
       )}

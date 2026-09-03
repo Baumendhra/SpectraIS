@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Shield, Lock, Mail, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowRight, Lock, Mail } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { api } from "@/lib/api";
@@ -40,38 +40,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="w-full max-w-md space-y-6 z-10">
+    <div className="min-h-screen bg-[#f8f5f0] flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md space-y-5">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 items-center justify-center shadow-xl shadow-blue-500/25 mb-2">
-            <Sparkles className="h-7 w-7 text-white" />
+        <div className="text-center space-y-1.5">
+          <div className="inline-flex h-12 w-12 rounded-lg bg-[#6f4e37] items-center justify-center text-[#f8f5f0] shadow-xs mb-1">
+            <ShieldCheck className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Spectra<span className="text-blue-500">IS</span> Copilot
+          <h1 className="text-2xl font-bold tracking-tight text-[#3d2b1f]">
+            Spectra<span className="text-[#6f4e37]">IS</span> Copilot
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#6f4e37]/80">
             Government Procurement BIS Standards & Compliance Portal
           </p>
         </div>
 
         {/* Login Form Card */}
-        <div className="glass-panel rounded-2xl p-6 shadow-2xl border border-slate-800 space-y-5">
+        <div className="bg-[#ebe5d8] rounded-lg p-6 shadow-card border border-[#c4a484]/50 space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+            <div className="p-3 rounded-md bg-[#f9ecec] border border-[#822424]/30 text-[#822424] text-xs font-medium">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-3.5">
             <Input
-              label="Email Address"
+              label="Official Email Address"
               type="email"
-              placeholder="officer@gov.in"
+              placeholder="officer@mohua.gov.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -86,39 +82,39 @@ export default function LoginPage() {
               required
             />
 
-            <Button type="submit" className="w-full py-2.5 text-sm" isLoading={isLoading}>
+            <Button type="submit" className="w-full py-2 text-sm mt-1" isLoading={isLoading}>
               Sign In to Portal <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
 
           {/* Quick Role Switcher Demo */}
-          <div className="pt-3 border-t border-slate-800/80 space-y-2">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block text-center">
+          <div className="pt-3 border-t border-[#c4a484]/40 space-y-2">
+            <span className="text-[10px] font-semibold text-[#6f4e37] uppercase tracking-wider block text-center">
               Quick Role Test Credentials
             </span>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => setDemoRole("admin@mohua.gov.in", "Admin123!")}
-                className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-blue-500/50 hover:text-white transition-colors text-left"
+                className="p-2 rounded-md bg-[#f8f5f0] border border-[#c4a484]/50 text-[#3d2b1f] hover:border-[#6f4e37] transition-colors text-left"
               >
-                <div className="font-semibold text-blue-400 text-[11px]">Super Admin</div>
-                <div className="text-[10px] text-slate-500 truncate">admin@mohua.gov.in</div>
+                <div className="font-semibold text-[#6f4e37] text-[11px]">Super Admin</div>
+                <div className="text-[10px] text-[#6f4e37]/75 font-mono truncate">admin@mohua.gov.in</div>
               </button>
               <button
                 type="button"
                 onClick={() => setDemoRole("officer@mohua.gov.in", "Officer123!")}
-                className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-blue-500/50 hover:text-white transition-colors text-left"
+                className="p-2 rounded-md bg-[#f8f5f0] border border-[#c4a484]/50 text-[#3d2b1f] hover:border-[#6f4e37] transition-colors text-left"
               >
-                <div className="font-semibold text-emerald-400 text-[11px]">Procurement Officer</div>
-                <div className="text-[10px] text-slate-500 truncate">officer@mohua.gov.in</div>
+                <div className="font-semibold text-[#295030] text-[11px]">Procurement Officer</div>
+                <div className="text-[10px] text-[#6f4e37]/75 font-mono truncate">officer@mohua.gov.in</div>
               </button>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-[11px] text-[#6f4e37]/70 font-medium">
           Protected by Enterprise JWT Authentication & RBAC Guards
         </p>
       </div>

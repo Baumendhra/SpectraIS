@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpen, Eye, CheckCircle2, ShieldAlert, Copy, Check, AlertTriangle, FileText } from "lucide-react";
+import { BookOpen, Eye, CheckCircle2, Copy, Check, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -21,6 +21,7 @@ interface RecommendationItem {
   supersession_warning?: string | null;
   tender_boq_clause?: string | null;
   nabl_testing_schedule?: string[];
+  version_status_badge?: string;
 }
 
 interface RecommendationCardsProps {
@@ -39,8 +40,8 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
 
   if (!recommendations || recommendations.length === 0) {
     return (
-      <div className="p-8 text-center border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
-        <p className="text-sm text-slate-400">No standards recommendations generated yet.</p>
+      <div className="p-8 text-center border border-dashed border-[#c4a484]/60 rounded-lg bg-[#ebe5d8]/40">
+        <p className="text-xs text-[#6f4e37]/80">No standards recommendations generated yet.</p>
       </div>
     );
   }
@@ -50,12 +51,12 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
       {recommendations.map((item) => (
         <div
           key={item.recommendation_id}
-          className="p-5 rounded-xl glass-panel border border-slate-800 hover:border-blue-500/40 transition-all flex flex-col justify-between space-y-4 group"
+          className="p-4 rounded-lg bg-white border border-[#c4a484]/35 shadow-card hover:border-[#6f4e37]/40 transition-all flex flex-col justify-between space-y-3"
         >
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {/* Header: IS Number & Badges */}
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <span className="font-bold text-base text-blue-400 tracking-tight">{item.is_number}</span>
+            <div className="flex items-center justify-between flex-wrap gap-1.5">
+              <span className="font-bold text-sm text-[#6f4e37] font-mono tracking-tight">{item.is_number}</span>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {item.is_qco_mandated && (
                   <Badge variant="danger" className="text-[10px] font-bold tracking-wide">
@@ -68,9 +69,9 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
                       ? "danger"
                       : "success"
                   }
-                  className="text-[10px] font-bold tracking-wide flex items-center gap-1"
+                  className="text-[10px] font-semibold tracking-wide"
                 >
-                  {item.version_status_badge || (item.status === "REVISED" ? "🔴 REVISED" : "🟢 Up-to-Date (2025 Edition)")}
+                  {item.version_status_badge || (item.status === "REVISED" ? "REVISED" : "Current Active Edition")}
                 </Badge>
                 <Badge
                   variant={
@@ -88,22 +89,22 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
             </div>
 
             {/* Standard Title & Scope */}
-            <h4 className="font-semibold text-sm text-slate-100 line-clamp-1">{item.standard_title}</h4>
-            <p className="text-xs text-slate-400 font-mono">Clause: {item.clause_reference}</p>
-            <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">{item.applicability_reason}</p>
+            <h4 className="font-semibold text-xs sm:text-sm text-[#3d2b1f] line-clamp-1">{item.standard_title}</h4>
+            <p className="text-[11px] text-[#6f4e37] font-mono">Clause: {item.clause_reference}</p>
+            <p className="text-xs text-[#3d2b1f]/85 line-clamp-2 leading-relaxed">{item.applicability_reason}</p>
 
             {/* Supersession Warning Banner if Applicable */}
             {item.supersession_warning && (
-              <div className="p-2.5 rounded-lg bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-300 flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="p-2.5 rounded-md bg-[#faf3e8] border border-[#7d5017]/30 text-[11px] text-[#7d5017] flex items-start gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-[#7d5017] shrink-0 mt-0.5" />
                 <span>{item.supersession_warning}</span>
               </div>
             )}
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
-            <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-medium">
+          <div className="pt-2.5 border-t border-[#c4a484]/25 flex items-center justify-between gap-2 flex-wrap">
+            <span className="text-[11px] text-[#295030] flex items-center gap-1 font-medium">
               <CheckCircle2 className="h-3.5 w-3.5" /> Cited Evidence Grounded
             </span>
 
@@ -113,16 +114,16 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
                   variant="outline"
                   size="sm"
                   onClick={() => handleCopyClause(item.recommendation_id, item.tender_boq_clause!)}
-                  className="text-xs gap-1.5 h-8 border-slate-700 hover:bg-slate-800 hover:text-slate-100"
+                  className="text-xs gap-1.5 h-7.5 border-[#c4a484] hover:bg-[#ebe5d8] text-[#3d2b1f]"
                   title="Copy ready-to-use Tender BOQ clause"
                 >
                   {copiedId === item.recommendation_id ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-400" /> Copied!
+                      <Check className="h-3.5 w-3.5 text-[#295030]" /> Copied!
                     </>
                   ) : (
                     <>
-                      <Copy className="h-3.5 w-3.5 text-slate-400" /> Copy BOQ Clause
+                      <Copy className="h-3.5 w-3.5 text-[#6f4e37]" /> Copy BOQ Clause
                     </>
                   )}
                 </Button>
@@ -132,7 +133,7 @@ export const RecommendationCards: React.FC<RecommendationCardsProps> = ({ recomm
                 variant="outline"
                 size="sm"
                 onClick={() => onInspectEvidence(item)}
-                className="text-xs gap-1.5 h-8 border-slate-700 hover:bg-blue-600/10 hover:text-blue-400"
+                className="text-xs gap-1.5 h-7.5 border-[#c4a484] hover:bg-[#ebe5d8] text-[#3d2b1f]"
               >
                 <Eye className="h-3.5 w-3.5" /> View Traceability
               </Button>
