@@ -33,25 +33,37 @@ class EmbeddingService:
         Uses deterministic semantic hashing fallback if API key is in mock mode.
         """
         if settings.GEMINI_API_KEY and not settings.GEMINI_API_KEY.startswith("MOCK") and genai is not None:
-            try:
-                if hasattr(genai, "Client"):
-                    client = genai.Client(api_key=settings.GEMINI_API_KEY)
-                    res = client.models.embed_content(
-                        model="text-embedding-004",
-                        contents=text
-                    )
-                    if hasattr(res, "embeddings") and res.embeddings:
-                        return [float(v) for v in res.embeddings[0].values]
-                elif hasattr(genai, "configure"):
-                    genai.configure(api_key=settings.GEMINI_API_KEY)
-                    res = genai.embed_content(
-                        model="models/text-embedding-004",
-                        content=text,
-                        task_type="retrieval_document"
-                    )
-                    return res['embedding']
-            except Exception as e:
-                logger.warning(f"Gemini embedding API call failed ({str(e)}), using deterministic vector fallback.")
+            # Model fallbacks in case text-embedding-004 is replaced or regional
+            candidate_models = ["gemini-embedding-2", "text-embedding-004", "gemini-embedding-001"]
+            for model_name in candidate_models:
+                try:
+                    if hasattr(genai, "Client"):
+                        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                        config = {"output_dimensionality": settings.VECTOR_SIZE}
+                        res = client.models.embed_content(
+                            model=model_name,
+                            contents=text,
+                            config=config
+                        )
+                        if hasattr(res, "embeddings") and res.embeddings:
+                            raw_vec = [float(v) for v in res.embeddings[0].values]
+                            norm = math.sqrt(sum(x * x for x in raw_vec))
+                            return [x / norm for x in raw_vec] if norm > 0 else raw_vec
+                    elif hasattr(genai, "configure"):
+                        genai.configure(api_key=settings.GEMINI_API_KEY)
+                        res = genai.embed_content(
+                            model=f"models/{model_name}" if not model_name.startswith("models/") else model_name,
+                            content=text,
+                            task_type="retrieval_document"
+                        )
+                        raw_vec = res['embedding']
+                        if len(raw_vec) > settings.VECTOR_SIZE:
+                            raw_vec = raw_vec[:settings.VECTOR_SIZE]
+                        norm = math.sqrt(sum(x * x for x in raw_vec))
+                        return [x / norm for x in raw_vec] if norm > 0 else raw_vec
+                except Exception as e:
+                    logger.debug(f"Gemini embedding with model {model_name} failed ({str(e)}), trying next candidate.")
+            logger.warning("All Gemini embedding models failed, using deterministic vector fallback.")
 
         # Deterministic fallback vector generation for local dev & testing
         vector = []

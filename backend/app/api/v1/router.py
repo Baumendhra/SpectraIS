@@ -5,7 +5,7 @@ from app.api.v1.users import router as users_router
 from app.api.v1.organizations import router as orgs_router
 from app.api.v1.audit import router as audit_router
 from app.api.v1.health import router as health_router
-from app.api.v1.copilot import router as copilot_router
+from app.api.v1.copilot import router as copilot_router, rag_router
 from app.api.v1.copilot_v2 import router as copilot_v2_router
 from app.api.v1.tenders_v2 import router as tenders_v2_router
 from app.api.v1.phase5_router import router as phase5_router
@@ -23,6 +23,7 @@ api_v1_router.include_router(users_router)
 api_v1_router.include_router(orgs_router)
 api_v1_router.include_router(audit_router)
 api_v1_router.include_router(copilot_router)
+api_v1_router.include_router(rag_router)
 api_v1_router.include_router(copilot_v2_router)
 api_v1_router.include_router(tenders_v2_router)
 api_v1_router.include_router(phase5_router)

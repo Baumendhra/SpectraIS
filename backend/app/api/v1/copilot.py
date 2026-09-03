@@ -50,3 +50,28 @@ async def query_copilot(
         user_id=user_id
     )
     return ResponseSchema(data=res)
+
+
+rag_router = APIRouter(prefix="/rag", tags=["AI Copilot & Retrieval (RAG)"])
+
+
+@rag_router.post("/ask")
+async def ask_rag(
+    req: CopilotQueryRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_current_user)
+):
+    """Alias for Copilot RAG query."""
+    service = RAGCopilotService(session)
+    user_id = str(current_user.id) if current_user else None
+    res = await service.answer_procurement_query(
+        user_query=req.query,
+        domain=req.domain,
+        category=req.category,
+        user_id=user_id
+    )
+    return {
+        "success": True,
+        **res,
+        "data": res
+    }
